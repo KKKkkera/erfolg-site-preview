@@ -27,7 +27,7 @@ const databaseConfigured = Boolean(process.env.DATABASE_URL?.trim());
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
   trailingSlash: false,
   poweredByHeader: false,
   compress: true,
