@@ -1,0 +1,361 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   ERFOLG — дизайн-система «Инженерный паспорт»
+   Хладный бумажно-белый фон, петролевые чернила, волосяные
+   линии, mono-ярлыки, сигнальный оранжевый из логотипа.
+   Шрифтовые переменные задаёт next/font в src/app/layout.tsx:
+   --font-sans (Manrope); --font-heading и --font-mono — алиасы на Manrope,
+   заданные ниже в :root.
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* Заголовки — тот же Manrope, что и текст (next/font вешает --font-sans
+       на <html>, то есть на этот же элемент — var() резолвится). */
+    --font-heading: var(--font-sans);
+    --font-mono: var(--font-sans);
+
+    /* Фон / текст */
+    --background: 210 33% 99%;          /* #FAFCFD — холодная бумага */
+    --foreground: 206 60% 9%;           /* #091E2A — петролевые чернила */
+    --surface: 204 26% 96%;             /* #F2F5F7 — приподнятые зоны */
+
+    /* Card / Popover */
+    --card: 0 0% 100%;
+    --card-foreground: 206 60% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 206 60% 9%;
+
+    /* Primary — затемнённый фирменный голубой #039FE4 (тот же тон и насыщенность).
+       Белый текст на нём — 5.7:1 (AA и для мелкого текста). */
+    --primary: 198 97% 31%;             /* #026E9C */
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 198 97% 24%;        /* #025579 — ховеры */
+
+    /* Фирменный голубой логотипа — только крупная графика и декор
+       (на белом ~3:1 — для текста непригоден). */
+    --brand: 198 97% 45%;               /* #039FE4 */
+
+    /* Фирменный оранжевый логотипа.
+       --accent-brand: декор, крупные цифры, текст на тёмном (4.6:1 на ink);
+       --accent-ink: затемнённый для мелкого текста на светлом (5.1:1). */
+    --accent-brand: 15 79% 51%;         /* #E55220 */
+    --accent-ink: 15 79% 43%;           /* #C44217 */
+
+    /* Secondary / Muted / Accent (ховеры) */
+    --secondary: 204 26% 96%;
+    --secondary-foreground: 206 60% 9%;
+    --muted: 204 26% 95%;
+    /* 38% светлоты: ≥5.9:1 на белом и ≥5.2:1 на surface-подложках */
+    --muted-foreground: 206 18% 38%;    /* #50646F */
+    --accent: 204 30% 93%;
+    --accent-foreground: 206 60% 9%;
+
+    /* Ink — тёмные «чернильные» секции: футер, CTA-баннеры */
+    --ink: 206 62% 10%;                 /* #0A1D29 */
+    --ink-foreground: 200 30% 96%;      /* почти белый, холодный */
+    --ink-muted: 205 25% 72%;           /* приглушённый текст на ink, ~8.6:1 */
+    --ink-border: 205 40% 22%;          /* линии на ink */
+
+    /* Статусы (значения выверены аудитом исходника — не менять) */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 25 90% 38%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Линии разметки: вертикали по краям колонки и разделители секций.
+       Средний тон с прозрачностью — читается и на бумаге, и на ink. */
+    --guide: 206 22% 58%;
+
+    /* Поля страницы. --page-gutter — от края экрана до вертикали разметки,
+       --page-pad — от вертикали до текста (у Laravel текст не притык к линии).
+       Паддинг контейнера = сумма обоих, см. tailwind.config.ts. */
+    --page-gutter: 1rem;
+    --page-pad: 1.25rem;
+    --page-max: 1400px;
+
+    /* Линии / поля / фокус */
+    --border: 206 24% 88%;              /* #D8E0E5 — hairline чуть заметнее */
+    --input: 206 24% 82%;               /* границы полей — темнее hairline */
+    --ring: 198 97% 31%;
+
+    /* Радиус: прямые углы — 90° у кнопок, карточек и полей */
+    --radius: 0rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+
+  /* Поля растут вместе с экраном; container.padding берёт их сумму */
+  @media (min-width: 640px) {
+    :root { --page-gutter: 1.5rem; --page-pad: 1.75rem; }
+  }
+  @media (min-width: 1024px) {
+    :root { --page-gutter: 2rem; --page-pad: 2.5rem; }
+  }
+
+  html { scroll-behavior: auto; }       /* без smooth — заказчик не хочет анимаций */
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "tnum" 0;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-medium;
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: rgba(229, 82, 32, 0.22); /* фирменный оранжевый */
+    color: hsl(var(--foreground));
+  }
+  /* Оранжевый фокус для «голых» ссылок (prose, футер и т.п.).
+     :where не повышает специфичность и не мешает компонентным ring-стилям. */
+  :where(a):focus-visible {
+    outline: 2px solid hsl(var(--accent-ink));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Технический mono-ярлык: «01 / ПОСТАВКА».
+     На мобильных трекинг уже: кириллические капсы при 0.18em на 375px
+     теряют разборчивость. */
+  .tech-label {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.14em] sm:tracking-[0.18em];
+  }
+
+  .guide-border {
+    border-color: hsl(var(--guide) / 0.3);
+  }
+
+  /* Вертикали по краям колонки контента.
+     Считаются от центра самого блока: ширина колонки — min(100%, --page-max),
+     от её половины отнимаем поле. Формула одинаково верна и для полноширинной
+     секции, и для секции-контейнера, поэтому линии соседних секций стыкуются
+     встык и читаются как одна сплошная вертикаль. */
+  .rails {
+    position: relative;
+    --col: calc(min(100%, var(--page-max)) / 2 - var(--page-gutter));
+  }
+  .rails::before,
+  .rails::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: hsl(var(--guide) / 0.24);
+    pointer-events: none;
+  }
+  .rails::before {
+    left: calc(50% - var(--col));
+  }
+  .rails::after {
+    left: calc(50% + var(--col));
+  }
+
+  /* Оранжевые засечки на пересечении вертикали и горизонтали секции.
+     Вешаются на .container внутри секции. .marks — на нижнюю линию
+     (секция с border-b), .marks-t — на верхнюю (секция с border-t).
+
+     Арифметика центровки, квадрат 5px на линии 1px:
+     вертикаль слева занимает [gutter, gutter+1] от левого края контейнера,
+     её центр — gutter+0.5; квадрат при left = gutter-2 занимает
+     [gutter-2, gutter+3], центр тот же.
+     Справа вертикаль занимает [W-gutter, W-gutter+1], центр W-gutter+0.5,
+     а right отмеряется от правого края — отсюда gutter-3, а не gutter-2.
+     По вертикали: bottom -3px даёт центр на 0.5px ниже кромки контейнера,
+     ровно по центру нижней рамки; top -3px — симметрично для верхней. */
+  .marks,
+  .marks-t {
+    position: relative;
+  }
+  .marks::before,
+  .marks::after,
+  .marks-t::before,
+  .marks-t::after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    height: 5px;
+    width: 5px;
+    background-color: hsl(var(--accent-brand));
+    pointer-events: none;
+  }
+  .marks::before,
+  .marks::after {
+    bottom: -3px;
+  }
+  .marks-t::before,
+  .marks-t::after {
+    top: -3px;
+  }
+  .marks::before,
+  .marks-t::before {
+    left: calc(var(--page-gutter) - 2px);
+  }
+  .marks::after,
+  .marks-t::after {
+    right: calc(var(--page-gutter) - 3px);
+  }
+
+  /* Лента начинается на левой направляющей контента, но справа доходит до
+     края viewport — как на референсе, без ограничения max-width контейнера. */
+  .brand-strip-layout {
+    --brand-strip-rail-offset: calc(
+      50% - min(100%, var(--page-max)) / 2 + var(--page-gutter)
+    );
+    padding-left: var(--brand-strip-rail-offset);
+  }
+
+  /* Правая направляющая начинается только под лентой — её продолжает
+     следующий rails-блок. Внутри самой ленты остаются лишь границы ячеек. */
+  .brand-strip.rails::after {
+    display: none;
+  }
+
+  /* Левая направляющая проходит через всю ленту и не перекрывается фоном ячеек. */
+  .brand-strip.rails::before {
+    z-index: 15;
+  }
+
+  /* На стыке героя нужна только левая точка: справа вертикаль начинается ниже ленты. */
+  .hero-boundary-marks::after {
+    display: none;
+  }
+
+  /* Точки на четырёх пересечениях рамки ленты с направляющими. */
+  .brand-strip-mark {
+    position: absolute;
+    z-index: 20;
+    height: 5px;
+    width: 5px;
+    background-color: hsl(var(--accent-brand));
+    pointer-events: none;
+  }
+  .brand-strip-mark-tl {
+    left: calc(var(--brand-strip-rail-offset) - 2px);
+    top: -3px;
+  }
+  .brand-strip-mark-bl {
+    bottom: -3px;
+    left: calc(var(--brand-strip-rail-offset) - 2px);
+  }
+  .brand-strip-mark-br {
+    bottom: -3px;
+    right: calc(var(--brand-strip-rail-offset) - 3px);
+  }
+
+  /* Короткое белое затухание скрывает жёсткий вход и выход логотипов. */
+  .manufacturer-marquee::before,
+  .manufacturer-marquee::after {
+    content: "";
+    position: absolute;
+    z-index: 10;
+    bottom: 0;
+    top: 0;
+    pointer-events: none;
+  }
+  .manufacturer-marquee::before {
+    left: 0;
+    width: clamp(56px, 5vw, 80px);
+    background: linear-gradient(
+      to right,
+      #fff 0%,
+      rgb(255 255 255 / 0.92) 20%,
+      rgb(255 255 255 / 0.48) 58%,
+      rgb(255 255 255 / 0) 100%
+    );
+  }
+  .manufacturer-marquee::after {
+    right: 0;
+    width: clamp(26px, 3vw, 48px);
+    background: linear-gradient(to left, #fff 0%, rgb(255 255 255 / 0) 100%);
+  }
+}
+
+/* Появление секций при скролле — только как progressive enhancement:
+   CSS scroll-driven animations (Chrome/Edge). В Firefox/Safari и при
+   prefers-reduced-motion элементы просто видимы без анимации. JS не нужен,
+   без JS ничего не прячется. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: fade-up 0.7s ease-out both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 45%;
+    }
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Пульс-линия (ЭКГ): прорисовка штриха при появлении */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ecg-draw {
+      stroke-dasharray: 2200;
+      stroke-dashoffset: 2200;
+      animation: ecg-draw 1.4s ease-out both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 70%;
+    }
+  }
+}
+
+@keyframes ecg-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manufacturer-marquee {
+    overflow-x: auto;
+  }
+}
+
+/* Tiptap-редактор — минимальная стилизация без @tailwindcss/typography */
+.tiptap-editor h2 { @apply text-lg font-semibold mt-3 mb-2; }
+.tiptap-editor h3 { @apply text-base font-semibold mt-3 mb-1.5; }
+.tiptap-editor p { @apply my-2 leading-6; }
+.tiptap-editor ul { @apply my-2 pl-5 list-disc; }
+.tiptap-editor ol { @apply my-2 pl-5 list-decimal; }
+.tiptap-editor blockquote {
+  @apply my-2 border-l-2 border-primary pl-3 italic text-muted-foreground;
+}
+.tiptap-editor a { @apply text-primary underline; }
+.tiptap-editor img { @apply my-2 rounded-md max-w-full h-auto; }
+.tiptap-editor code {
+  @apply rounded bg-muted px-1 py-0.5 font-mono text-xs;
+}
+.tiptap-editor pre {
+  @apply my-2 rounded-md bg-muted p-3 font-mono text-xs overflow-x-auto;
+}
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-muted-foreground pointer-events-none float-left h-0;
+}
+
+@keyframes showcaseIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

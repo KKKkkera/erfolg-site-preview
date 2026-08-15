@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Стилизованная иллюстрация прикроватного монитора пациента">
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E2E8F0" stroke-width="1"/>
+    </pattern>
+    <pattern id="grid-fine" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#039FE4" stroke-width="0.4" opacity="0.18"/>
+    </pattern>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="#FFFFFF"/>
+  <rect width="1200" height="900" fill="url(#grid)"/>
+
+  <!-- Top tag strip -->
+  <g font-family="ui-monospace, SFMono-Regular, monospace" font-size="14" fill="#64748B" letter-spacing="2">
+    <text x="60" y="50">E—01</text>
+    <text x="60" y="72" font-size="11">PATIENT MONITOR / ICU SERIES</text>
+    <line x1="200" y1="46" x2="1140" y2="46" stroke="#E2E8F0"/>
+    <text x="1140" y="50" text-anchor="end">REF / EM-2400</text>
+  </g>
+
+  <!-- Cross marks (corner registration ticks) -->
+  <g stroke="#039FE4" stroke-width="1.5">
+    <path d="M 60 130 h 16 M 68 122 v 16"/>
+    <path d="M 1124 130 h 16 M 1132 122 v 16"/>
+    <path d="M 60 770 h 16 M 68 762 v 16"/>
+    <path d="M 1124 770 h 16 M 1132 762 v 16"/>
+  </g>
+
+  <!-- Monitor frame -->
+  <g transform="translate(180 160)">
+    <!-- Outer device shell -->
+    <rect x="0" y="0" width="840" height="600" rx="22" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+
+    <!-- Top brand stripe -->
+    <rect x="0" y="0" width="840" height="44" rx="22" fill="#0F172A"/>
+    <rect x="0" y="22" width="840" height="22" fill="#0F172A"/>
+    <text x="32" y="29" font-family="ui-monospace, monospace" font-size="13" fill="#94A3B8" letter-spacing="3">ERFOLG · ICU MONITOR</text>
+    <circle cx="800" cy="22" r="5" fill="#16A34A"/>
+    <text x="788" y="26" text-anchor="end" font-family="ui-monospace, monospace" font-size="11" fill="#94A3B8" letter-spacing="2">ON</text>
+
+    <!-- Screen area -->
+    <rect x="24" y="60" width="792" height="490" rx="6" fill="url(#screen)"/>
+    <rect x="24" y="60" width="792" height="490" rx="6" fill="url(#grid-fine)"/>
+
+    <!-- ECG label + waveform -->
+    <g font-family="ui-monospace, monospace" fill="#CBD5E1" font-size="12" letter-spacing="2">
+      <text x="44" y="90">ECG II</text>
+      <text x="780" y="90" text-anchor="end" fill="#22D3EE">25 mm/s</text>
+    </g>
+    <path d="M 44 160 L 160 160 L 168 152 L 178 168 L 188 130 L 198 200 L 206 156 L 220 160 L 360 160 L 368 152 L 378 168 L 388 130 L 398 200 L 406 156 L 420 160 L 560 160 L 568 152 L 578 168 L 588 130 L 598 200 L 606 156 L 620 160 L 800 160"
+          fill="none" stroke="#22D3EE" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- SpO2 label + waveform -->
+    <g font-family="ui-monospace, monospace" fill="#CBD5E1" font-size="12" letter-spacing="2">
+      <text x="44" y="270">SpO₂ Pleth</text>
+    </g>
+    <path d="M 44 340 C 80 340 100 290 140 290 S 200 360 240 340 C 280 340 300 290 340 290 S 400 360 440 340 C 480 340 500 290 540 290 S 600 360 640 340 C 680 340 700 290 740 290 S 800 360 800 340"
+          fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- RESP -->
+    <g font-family="ui-monospace, monospace" fill="#CBD5E1" font-size="12" letter-spacing="2">
+      <text x="44" y="430">RESP</text>
+    </g>
+    <path d="M 44 480 C 100 480 130 450 200 450 S 320 510 380 480 C 440 450 480 450 540 480 S 660 510 720 480 L 800 480"
+          fill="none" stroke="#FACC15" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+
+    <!-- Bottom readouts row -->
+    <g>
+      <!-- HR -->
+      <rect x="44" y="510" width="180" height="32" rx="4" fill="#0F172A" opacity="0.4"/>
+      <text x="56" y="532" font-family="ui-monospace, monospace" font-size="11" fill="#94A3B8" letter-spacing="2">HR · bpm</text>
+      <text x="216" y="535" text-anchor="end" font-family="Manrope, sans-serif" font-size="22" font-weight="700" fill="#22D3EE">76</text>
+
+      <!-- SpO2 -->
+      <rect x="244" y="510" width="180" height="32" rx="4" fill="#0F172A" opacity="0.4"/>
+      <text x="256" y="532" font-family="ui-monospace, monospace" font-size="11" fill="#94A3B8" letter-spacing="2">SpO₂ · %</text>
+      <text x="416" y="535" text-anchor="end" font-family="Manrope, sans-serif" font-size="22" font-weight="700" fill="#A78BFA">98</text>
+
+      <!-- NIBP -->
+      <rect x="444" y="510" width="180" height="32" rx="4" fill="#0F172A" opacity="0.4"/>
+      <text x="456" y="532" font-family="ui-monospace, monospace" font-size="11" fill="#94A3B8" letter-spacing="2">NIBP · mmHg</text>
+      <text x="616" y="535" text-anchor="end" font-family="Manrope, sans-serif" font-size="18" font-weight="700" fill="#F8FAFC">122/78</text>
+
+      <!-- TEMP -->
+      <rect x="644" y="510" width="172" height="32" rx="4" fill="#0F172A" opacity="0.4"/>
+      <text x="656" y="532" font-family="ui-monospace, monospace" font-size="11" fill="#94A3B8" letter-spacing="2">TEMP · °C</text>
+      <text x="808" y="535" text-anchor="end" font-family="Manrope, sans-serif" font-size="22" font-weight="700" fill="#FACC15">36.6</text>
+    </g>
+
+    <!-- Bottom controls bar -->
+    <g transform="translate(0 560)">
+      <rect x="24" y="0" width="792" height="36" rx="6" fill="#E2E8F0"/>
+      <g fill="#475569">
+        <circle cx="56" cy="18" r="6"/>
+        <circle cx="84" cy="18" r="6"/>
+        <circle cx="112" cy="18" r="6"/>
+      </g>
+      <text x="156" y="22" font-family="ui-monospace, monospace" font-size="11" fill="#475569" letter-spacing="2">MENU · ALARMS · TRENDS · NIBP · ADMIT</text>
+      <rect x="700" y="6" width="100" height="24" rx="4" fill="#039FE4"/>
+      <text x="750" y="22" text-anchor="middle" font-family="ui-monospace, monospace" font-size="11" fill="#FFFFFF" letter-spacing="2">RECORD</text>
+    </g>
+  </g>
+
+  <!-- Side meta (right column) -->
+  <g font-family="ui-monospace, monospace" font-size="11" letter-spacing="2" fill="#64748B">
+    <text x="1140" y="200" text-anchor="end">CLASS · IIb</text>
+    <line x1="1060" y1="210" x2="1140" y2="210" stroke="#CBD5E1"/>
+    <text x="1140" y="232" text-anchor="end" fill="#94A3B8">EN 60601-1</text>
+
+    <text x="1140" y="320" text-anchor="end">CHANNELS · 5</text>
+    <line x1="1060" y1="330" x2="1140" y2="330" stroke="#CBD5E1"/>
+    <text x="1140" y="352" text-anchor="end" fill="#94A3B8">ECG · SpO₂ · NIBP · TEMP · RESP</text>
+
+    <text x="1140" y="440" text-anchor="end">SCREEN · 12.1″</text>
+    <line x1="1060" y1="450" x2="1140" y2="450" stroke="#CBD5E1"/>
+    <text x="1140" y="472" text-anchor="end" fill="#94A3B8">1024 × 768 · TFT</text>
+
+    <text x="1140" y="560" text-anchor="end">BATTERY · 4 h</text>
+    <line x1="1060" y1="570" x2="1140" y2="570" stroke="#CBD5E1"/>
+    <text x="1140" y="592" text-anchor="end" fill="#94A3B8">Li-Ion 14.8 V</text>
+  </g>
+
+  <!-- Left meta (small annotations) -->
+  <g font-family="ui-monospace, monospace" font-size="11" letter-spacing="2" fill="#64748B">
+    <text x="60" y="200">FIG · 01</text>
+    <text x="60" y="222" fill="#94A3B8">ICU MONITOR</text>
+
+    <text x="60" y="440">SAFETY</text>
+    <text x="60" y="462" fill="#94A3B8">IPX1 / TYPE CF</text>
+
+    <text x="60" y="600">AUDIT</text>
+    <text x="60" y="622" fill="#94A3B8">EVENT LOG · ON</text>
+  </g>
+
+  <!-- Bottom strip -->
+  <g>
+    <line x1="60" y1="820" x2="1140" y2="820" stroke="#E2E8F0"/>
+    <text x="60" y="850" font-family="ui-monospace, monospace" font-size="12" fill="#0F172A" letter-spacing="3">ERFOLG · MEDICAL EQUIPMENT</text>
+    <text x="60" y="868" font-family="ui-monospace, monospace" font-size="11" fill="#64748B" letter-spacing="2">REANIMATION · INTENSIVE CARE · ROSZDRAVNADZOR REGISTERED</text>
+    <text x="1140" y="850" text-anchor="end" font-family="ui-monospace, monospace" font-size="12" fill="#039FE4" letter-spacing="3">© 2026</text>
+  </g>
+</svg>

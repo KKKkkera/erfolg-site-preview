@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Дефибриллятор-монитор Nihon Kohden TEC-5631 — технический чертёж">
+  <title>Дефибриллятор-монитор Nihon Kohden TEC-5631</title>
+  <g stroke="#E4EEF5" stroke-width="0.8">
+    <path d="M0 25H400M0 50H400M0 75H400M0 100H400M0 125H400M0 150H400M0 175H400M0 200H400M0 225H400M0 250H400M0 275H400M0 300H400M0 325H400M0 350H400M0 375H400"/>
+    <path d="M25 0V400M50 0V400M75 0V400M100 0V400M125 0V400M150 0V400M175 0V400M200 0V400M225 0V400M250 0V400M275 0V400M300 0V400M325 0V400M350 0V400M375 0V400"/>
+  </g>
+  <g stroke="#E55220" stroke-width="2" fill="none">
+    <path d="M14 26V14H26M374 14H386V26M386 374V386H374M26 386H14V374"/>
+  </g>
+  <text x="386" y="34" text-anchor="end" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#6C93AE">TEC-5631</text>
+
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- Ручка для переноски -->
+    <path d="M158 118v-14a10 10 0 0 1 10-10h64a10 10 0 0 1 10 10v14" fill="#FFFFFF" stroke="#123B55" stroke-width="2.5"/>
+    <!-- Корпус: скошенная передняя панель -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <path d="M112 158 128 120h144l16 38v130a8 8 0 0 1-8 8H120a8 8 0 0 1-8-8Z"/>
+      <path d="M112 158h176"/>
+    </g>
+    <!-- Экран на скошенной панели -->
+    <path d="M138 128h70l4 24h-78Z" fill="#EAF3F8" stroke="#123B55" stroke-width="2"/>
+    <path d="M142 142h10l3-7 4 12 3-7h8l3-5 4 9 3-5h20" fill="none" stroke="#E55220" stroke-width="1.8"/>
+    <!-- Поворотный селектор энергии -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2">
+      <circle cx="246" cy="140" r="15"/>
+      <path d="M246 140 254 128"/>
+    </g>
+    <g stroke="#6C93AE" stroke-width="1.2">
+      <path d="M246 121v-5M259 126l3-4M264 140h5M228 140h5M233 126l-3-4"/>
+    </g>
+    <!-- Передняя панель: кнопки и индикаторы -->
+    <g fill="#FFFFFF" stroke="#6C93AE" stroke-width="1.5">
+      <rect x="130" y="176" width="46" height="18" rx="3"/>
+      <rect x="186" y="176" width="46" height="18" rx="3"/>
+      <circle cx="258" cy="185" r="9"/>
+    </g>
+    <circle cx="258" cy="185" r="3.5" fill="#E55220" stroke="none"/>
+    <g stroke="#6C93AE" stroke-width="1.3">
+      <path d="M132 216h136M132 228h96"/>
+    </g>
+    <!-- Динамик -->
+    <g stroke="#6C93AE" stroke-width="1.2">
+      <path d="M132 250h28M132 258h28M132 266h28"/>
+    </g>
+    <!-- Электроды на боковых доках -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <rect x="76" y="168" width="36" height="64" rx="10"/>
+      <path d="M94 168v-22a7 7 0 0 1 7-7h12"/>
+      <rect x="288" y="168" width="36" height="64" rx="10"/>
+      <path d="M306 168v-22a7 7 0 0 0-7-7h-12"/>
+    </g>
+    <g stroke="#6C93AE" stroke-width="1.3">
+      <path d="M86 182h16M86 218h16M298 182h16M298 218h16"/>
+    </g>
+    <!-- Кабель электрода -->
+    <path d="M94 232c-8 30 4 44 22 52s26 24 14 44" fill="none" stroke="#6C93AE" stroke-width="1.5"/>
+  </g>
+
+  <g stroke="#123B55" stroke-width="1.5"><path d="M84 348H316"/></g>
+  <g stroke="#6C93AE" stroke-width="1">
+    <path d="M96 348l-8 9M126 348l-8 9M156 348l-8 9M186 348l-8 9M216 348l-8 9M246 348l-8 9M276 348l-8 9M306 348l-8 9"/>
+  </g>
+
+  <!-- Выноска: селектор энергии -->
+  <g fill="none" stroke="#C44217" stroke-width="1.3">
+    <path d="M262 132c26-18 56-26 84-26"/>
+    <circle cx="260" cy="133" r="2.4" fill="#C44217"/>
+  </g>
+  <text x="348" y="96" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="11" fill="#C44217">ДЖ 1-270</text>
+
+  <g stroke="#6C93AE" stroke-width="1">
+    <path d="M200 372h0M112 366v6M288 366v6M112 369h176"/>
+  </g>
+  <text x="200" y="386" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="11" letter-spacing="1.5" fill="#6C93AE">W 320</text>
+</svg>

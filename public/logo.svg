@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Erfolg">
+  <!-- Знак бренда для schema.org Organization.logo (файл раньше отсутствовал,
+       и JSON-LD ссылался на 404). Повторяет плашку из opengraph-image. -->
+  <rect width="512" height="512" rx="112" fill="#039FE4"/>
+  <path fill="#FFFFFF" d="M166 128h190v56H230v66h112v54H230v74h128v56H166V128z"/>
+</svg>

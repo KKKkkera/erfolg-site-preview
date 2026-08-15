@@ -1,0 +1,29 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next/
+/out/
+
+# Local environment variables
+.env*
+!.env.example
+
+# Logs
+*.log
+.dev-server.*.log
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Vercel local settings
+.vercel
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Unused local source image (the deployed copy lives in public/)
+/ChatGPT Image *.png

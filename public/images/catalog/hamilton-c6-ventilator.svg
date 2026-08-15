@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Аппарат ИВЛ Hamilton-C6 — технический чертёж">
+  <title>Аппарат ИВЛ Hamilton-C6</title>
+  <g stroke="#E4EEF5" stroke-width="0.8">
+    <path d="M0 25H400M0 50H400M0 75H400M0 100H400M0 125H400M0 150H400M0 175H400M0 200H400M0 225H400M0 250H400M0 275H400M0 300H400M0 325H400M0 350H400M0 375H400"/>
+    <path d="M25 0V400M50 0V400M75 0V400M100 0V400M125 0V400M150 0V400M175 0V400M200 0V400M225 0V400M250 0V400M275 0V400M300 0V400M325 0V400M350 0V400M375 0V400"/>
+  </g>
+  <g stroke="#E55220" stroke-width="2" fill="none">
+    <path d="M14 26V14H26M374 14H386V26M386 374V386H374M26 386H14V374"/>
+  </g>
+  <text x="386" y="34" text-anchor="end" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#6C93AE">C6</text>
+
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- Тележка: основание -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <path d="M150 344 172 330H288L310 344Z"/>
+      <circle cx="163" cy="352" r="8"/>
+      <circle cx="297" cy="352" r="8"/>
+    </g>
+    <!-- Корпус вентиляционного блока -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <rect x="176" y="216" width="108" height="114" rx="8"/>
+    </g>
+    <g stroke="#6C93AE" stroke-width="1.5" fill="none">
+      <path d="M188 240h84M188 254h84"/>
+      <circle cx="200" cy="304" r="10"/>
+      <circle cx="230" cy="304" r="10"/>
+      <rect x="252" y="296" width="20" height="16" rx="2"/>
+    </g>
+    <!-- Колонна к монитору -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <rect x="222" y="150" width="14" height="66" rx="3"/>
+    </g>
+    <!-- Кронштейн монитора -->
+    <path d="M222 160H162v-14" fill="none" stroke="#123B55" stroke-width="2.5"/>
+    <!-- Сенсорный монитор -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <rect x="96" y="62" width="132" height="86" rx="7"/>
+    </g>
+    <rect x="106" y="72" width="112" height="66" rx="3" fill="#EAF3F8" stroke="#123B55" stroke-width="2"/>
+    <!-- Кривые давления/потока -->
+    <path d="M112 94c6-14 10-14 14 0 3 11 6 12 10 2l4-10c4-10 8-10 12 0l4 10c4 10 7 9 10-2 4-14 8-14 14 0" fill="none" stroke="#E55220" stroke-width="2"/>
+    <path d="M112 122h10v-8h14v8h12v-8h14v8h12v-8h14v8h12" fill="none" stroke="#6C93AE" stroke-width="1.5"/>
+    <!-- Дыхательный контур: гофрированный шланг от блока к плечу пациента -->
+    <path d="M176 262c-30 0-44 8-52 24-7 14-8 34-4 50" fill="none" stroke="#123B55" stroke-width="2.5"/>
+    <g stroke="#6C93AE" stroke-width="1.3">
+      <path d="M168 258l-4 10M158 261l-4 10M149 267l-4 10M142 276l-4 10M137 287l-3 10M134 299l-2 10M133 311l-1 10M133 323l0 10"/>
+    </g>
+    <!-- Увлажнитель на колонне -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2">
+      <rect x="286" y="252" width="34" height="30" rx="4"/>
+      <path d="M292 262h22M292 270h22" stroke="#6C93AE" stroke-width="1.3"/>
+    </g>
+    <path d="M284 268h-0" stroke="#123B55" stroke-width="2"/>
+  </g>
+
+  <g stroke="#123B55" stroke-width="1.5"><path d="M96 362H332"/></g>
+  <g stroke="#6C93AE" stroke-width="1">
+    <path d="M108 362l-8 9M138 362l-8 9M168 362l-8 9M198 362l-8 9M228 362l-8 9M258 362l-8 9M288 362l-8 9M318 362l-8 9"/>
+  </g>
+
+  <!-- Выноска: вентиляционный блок -->
+  <g fill="none" stroke="#C44217" stroke-width="1.3">
+    <path d="M288 226c22-8 44-8 62-4"/>
+    <circle cx="286" cy="227" r="2.4" fill="#C44217"/>
+  </g>
+  <text x="352" y="212" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="11" fill="#C44217">ТУРБИНА</text>
+
+  <g stroke="#6C93AE" stroke-width="1">
+    <path d="M66 62v297M60 62h12M60 359h12"/>
+  </g>
+  <text x="52" y="212" transform="rotate(-90 52 212)" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="11" letter-spacing="1.5" fill="#6C93AE">H 1350</text>
+</svg>

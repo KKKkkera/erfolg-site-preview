@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Гематологический анализатор Sysmex XN-350 — технический чертёж">
+  <title>Гематологический анализатор Sysmex XN-350</title>
+  <g stroke="#E4EEF5" stroke-width="0.8">
+    <path d="M0 25H400M0 50H400M0 75H400M0 100H400M0 125H400M0 150H400M0 175H400M0 200H400M0 225H400M0 250H400M0 275H400M0 300H400M0 325H400M0 350H400M0 375H400"/>
+    <path d="M25 0V400M50 0V400M75 0V400M100 0V400M125 0V400M150 0V400M175 0V400M200 0V400M225 0V400M250 0V400M275 0V400M300 0V400M325 0V400M350 0V400M375 0V400"/>
+  </g>
+  <g stroke="#E55220" stroke-width="2" fill="none">
+    <path d="M14 26V14H26M374 14H386V26M386 374V386H374M26 386H14V374"/>
+  </g>
+  <text x="386" y="34" text-anchor="end" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="13" letter-spacing="2.5" fill="#6C93AE">XN-350</text>
+
+  <g stroke-linejoin="round" stroke-linecap="round">
+    <!-- Корпус настольного анализатора -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <path d="M112 122a10 10 0 0 1 10-10h140a10 10 0 0 1 10 10v176H112Z"/>
+      <path d="M112 298h160l14 22H98Z"/>
+    </g>
+    <!-- Наклонный сенсорный экран сверху -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2.5">
+      <path d="M126 112 150 74h94l14 38Z"/>
+    </g>
+    <path d="M138 106 156 80h82l10 26Z" fill="#EAF3F8" stroke="#123B55" stroke-width="2"/>
+    <!-- Гистограмма на экране -->
+    <g stroke="#6C93AE" stroke-width="1.4">
+      <path d="M170 100v-8M180 100v-13M190 100v-6M200 100v-11"/>
+    </g>
+    <path d="M212 88c6 8 14 10 22 8" fill="none" stroke="#E55220" stroke-width="1.8"/>
+    <!-- Зона пробы: открытый порт с пробиркой -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2">
+      <rect x="222" y="180" width="34" height="58" rx="5"/>
+    </g>
+    <g fill="#EAF3F8" stroke="#123B55" stroke-width="1.8">
+      <path d="M234 192h10v30a5 5 0 0 1-10 0Z"/>
+    </g>
+    <path d="M234 204h10" stroke="#E55220" stroke-width="1.8"/>
+    <!-- Аспирационная игла над пробиркой -->
+    <path d="M239 180v-16" stroke="#123B55" stroke-width="2"/>
+    <path d="M235 164h8" stroke="#123B55" stroke-width="2"/>
+    <!-- Панель статуса слева -->
+    <g fill="#FFFFFF" stroke="#6C93AE" stroke-width="1.4">
+      <rect x="132" y="150" width="64" height="10" rx="2"/>
+      <rect x="132" y="168" width="64" height="10" rx="2"/>
+    </g>
+    <circle cx="140" cy="196" r="4" fill="#E55220" stroke="none"/>
+    <text x="150" y="200" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="10" fill="#6C93AE">READY</text>
+    <!-- Вентиляционные прорези -->
+    <g stroke="#6C93AE" stroke-width="1.2">
+      <path d="M132 262h44M132 270h44M132 278h44"/>
+    </g>
+    <!-- Кнопка старта -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2">
+      <circle cx="239" cy="262" r="11"/>
+    </g>
+    <circle cx="239" cy="262" r="4.5" fill="#EAF3F8" stroke="#6C93AE" stroke-width="1.2"/>
+    <!-- Штатив с пробирками рядом -->
+    <g fill="#FFFFFF" stroke="#123B55" stroke-width="2">
+      <rect x="296" y="266" width="58" height="32" rx="4"/>
+    </g>
+    <g fill="#EAF3F8" stroke="#123B55" stroke-width="1.6">
+      <path d="M304 274h8v18a4 4 0 0 1-8 0ZM318 274h8v18a4 4 0 0 1-8 0ZM332 274h8v18a4 4 0 0 1-8 0Z"/>
+    </g>
+    <g stroke="#E55220" stroke-width="1.4">
+      <path d="M304 282h8M318 282h8M332 282h8"/>
+    </g>
+  </g>
+
+  <!-- Линия стола -->
+  <g stroke="#123B55" stroke-width="1.5"><path d="M72 328H368"/></g>
+  <g stroke="#6C93AE" stroke-width="1">
+    <path d="M84 328l-8 9M114 328l-8 9M144 328l-8 9M174 328l-8 9M204 328l-8 9M234 328l-8 9M264 328l-8 9M294 328l-8 9M324 328l-8 9M354 328l-8 9"/>
+  </g>
+
+  <!-- Выноска: порт пробы -->
+  <g fill="none" stroke="#C44217" stroke-width="1.3">
+    <path d="M258 196c26-8 52-6 72 2"/>
+    <circle cx="256" cy="197" r="2.4" fill="#C44217"/>
+  </g>
+  <text x="336" y="184" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="11" fill="#C44217">ПРОБА 25 МКЛ</text>
+
+  <g stroke="#6C93AE" stroke-width="1">
+    <path d="M86 74v251M80 74h12M80 325h12"/>
+  </g>
+  <text x="72" y="200" transform="rotate(-90 72 200)" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Consolas, monospace" font-size="11" letter-spacing="1.5" fill="#6C93AE">H 480</text>
+</svg>
