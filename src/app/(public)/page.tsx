@@ -392,13 +392,7 @@ export default async function HomePage() {
           </div>
 
           <div className="relative z-20 min-w-0 max-w-[44rem] lg:max-w-[46%] xl:max-w-[44rem]">
-            {/* ml-px — оптическая посадка ярлыка относительно заголовка */}
-            <SectionTag className="ml-1 text-[13px]">
-              Нам доверяют с{" "}
-              <span className="font-bold text-foreground">2012</span>{" "}года
-            </SectionTag>
-
-            <h1 className="mt-7 max-w-[44rem] text-balance text-[1.75rem] font-semibold leading-[1.25] tracking-tight text-foreground sm:text-[2.2rem] lg:text-[2.6rem] xl:text-[3rem]">
+            <h1 className="max-w-[44rem] text-balance text-[1.75rem] font-semibold leading-[1.25] tracking-tight text-foreground sm:text-[2.2rem] lg:text-[2.6rem] xl:text-[3rem]">
               Поставка и{" "}ремонт медицинской техники{" "}
               {/* Акцент — не заливка текста и не жирная черта, а тонкая
                   ЭКГ-линия из логотипа под фразой. */}
