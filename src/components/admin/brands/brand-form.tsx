@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import {
 import { ConfirmDeleteButton } from "@/components/admin/confirm-delete-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MediaPickerDialog } from "@/components/admin/media/media-picker-dialog";
 import { deleteBrand, saveBrand } from "@/server/actions/admin/brands";
 import { slugify } from "@/lib/slugify";
 
@@ -25,14 +27,18 @@ export type BrandFormInitial = {
   slug?: string;
   country?: string | null;
   website?: string | null;
+  logo?: string | null;
+  sort?: number;
 };
 
 export function BrandForm({
   mode,
   initial,
+  s3Configured,
 }: {
   mode: "create" | "edit";
   initial?: BrandFormInitial;
+  s3Configured: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -40,6 +46,7 @@ export function BrandForm({
   const [name, setName] = useState(initial?.name ?? "");
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(initial?.slug));
+  const [logo, setLogo] = useState(initial?.logo ?? "");
 
   function onNameChange(value: string) {
     setName(value);
@@ -58,6 +65,8 @@ export function BrandForm({
       slug: String(fd.get("slug") ?? ""),
       country: String(fd.get("country") ?? ""),
       website: String(fd.get("website") ?? ""),
+      logo,
+      sort: Number(fd.get("sort") ?? 0),
     };
     startTransition(async () => {
       const res = await saveBrand(payload);
@@ -131,6 +140,57 @@ export function BrandForm({
               />
             </Field>
           </div>
+          <Field label="Порядок в карусели" name="sort" error={errors.sort}>
+            <Input
+              id="sort"
+              name="sort"
+              type="number"
+              min={0}
+              step={1}
+              defaultValue={initial?.sort ?? 0}
+              disabled={pending}
+            />
+          </Field>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Логотип в карусели</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {logo ? (
+            <div className="relative flex h-28 max-w-sm items-center justify-center rounded-md border bg-white p-5">
+              <Image
+                src={logo}
+                alt={name || "Логотип бренда"}
+                width={280}
+                height={72}
+                className="max-h-16 w-auto max-w-full object-contain"
+                unoptimized
+              />
+              <button
+                type="button"
+                onClick={() => setLogo("")}
+                disabled={pending}
+                className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm hover:text-destructive"
+                aria-label="Убрать логотип"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Логотип не выбран — в карусели название будет показано как текстовый логотип.
+            </p>
+          )}
+          <MediaPickerDialog
+            triggerLabel={logo ? "Заменить логотип" : "Выбрать или загрузить логотип"}
+            triggerVariant="outline"
+            onSelect={(item) => setLogo(item.url)}
+            s3Configured={s3Configured}
+            origin="brands"
+          />
         </CardContent>
       </Card>
 

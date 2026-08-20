@@ -26,10 +26,18 @@ const ProductInput = z
     fullDesc: z.string().trim().max(20000).optional().or(z.literal("")),
     regNumber: z.string().trim().max(120).optional().or(z.literal("")),
     regDate: z.string().trim().optional().or(z.literal("")),
+    regValidUntil: z.string().trim().optional().or(z.literal("")),
+    regAuthority: z.string().trim().max(200).optional().or(z.literal("")),
     regUrl: optionalSafeUrl,
+    // "" — не указано: старым карточкам «нет» молча не проставляем
+    markingRequired: z.enum(["", "yes", "no"]).default(""),
+    markingCodes: z.string().trim().max(300).optional().or(z.literal("")),
     seoTitle: z.string().trim().max(200).optional().or(z.literal("")),
     seoDesc: z.string().trim().max(400).optional().or(z.literal("")),
     sort: z.coerce.number().int().min(0).max(100000).default(0),
+    showOnHome: z.boolean().default(false),
+    homeSort: z.coerce.number().int().min(0).max(100000).default(0),
+    homeBadge: z.string().trim().max(40).optional().or(z.literal("")),
   })
   .refine(
     (data) => {
@@ -87,6 +95,15 @@ export async function saveProduct(
     };
   }
 
+  const regValidUntil = data.regValidUntil ? new Date(data.regValidUntil) : null;
+  if (regValidUntil && Number.isNaN(regValidUntil.getTime())) {
+    return {
+      ok: false,
+      errors: { regValidUntil: "Некорректная дата" },
+      message: "Некорректная дата",
+    };
+  }
+
   const payload = {
     name: data.name,
     slug,
@@ -100,10 +117,18 @@ export async function saveProduct(
     fullDesc: data.fullDesc?.trim() ? data.fullDesc.trim() : null,
     regNumber: data.regNumber?.trim() ? data.regNumber.trim() : null,
     regDate,
+    regValidUntil,
+    regAuthority: data.regAuthority?.trim() ? data.regAuthority.trim() : null,
     regUrl: data.regUrl?.trim() ? data.regUrl.trim() : null,
+    markingRequired:
+      data.markingRequired === "" ? null : data.markingRequired === "yes",
+    markingCodes: data.markingCodes?.trim() ? data.markingCodes.trim() : null,
     seoTitle: data.seoTitle?.trim() ? data.seoTitle.trim() : null,
     seoDesc: data.seoDesc?.trim() ? data.seoDesc.trim() : null,
     sort: data.sort,
+    showOnHome: data.showOnHome,
+    homeSort: data.homeSort,
+    homeBadge: data.homeBadge?.trim() ? data.homeBadge.trim() : null,
   };
 
   try {
@@ -124,23 +149,13 @@ export async function saveProduct(
     revalidatePath("/admin/products");
     revalidatePath(`/admin/products/${id}`);
     revalidatePath("/catalog");
+    revalidatePath("/");
 
     // IndexNow ping (no-op без INDEXNOW_KEY). Fire-and-forget.
+    // Страниц категорий нет — категория живёт только как фильтр каталога,
+    // поэтому пингуем саму карточку и общий /catalog.
     if (data.status === "ACTIVE") {
-      try {
-        const cat = await db.category.findUnique({
-          where: { id: data.categoryId },
-          select: { slug: true },
-        });
-        if (cat?.slug) {
-          void pingIndexNow([
-            `/catalog/${cat.slug}/${slug}`,
-            `/catalog/${cat.slug}`,
-          ]);
-        }
-      } catch (err) {
-        console.error("indexnow product url resolve error", err);
-      }
+      void pingIndexNow([`/catalog/${slug}`, "/catalog"]);
     }
 
     return { ok: true, id };
@@ -160,18 +175,16 @@ export async function deleteProduct(id: string) {
   try {
     // Получаем slug перед удалением для последующего IndexNow-ping.
     const before = await db.product
-      .findUnique({
-        where: { id },
-        select: { slug: true, category: { select: { slug: true } } },
-      })
+      .findUnique({ where: { id }, select: { slug: true } })
       .catch(() => null);
 
     await db.product.delete({ where: { id } });
     await logAction(admin.id, "delete", "Product", id);
     revalidatePath("/admin/products");
+    revalidatePath("/");
 
-    if (before?.slug && before.category?.slug) {
-      void pingIndexNow([`/catalog/${before.category.slug}`]);
+    if (before?.slug) {
+      void pingIndexNow([`/catalog/${before.slug}`, "/catalog"]);
     }
 
     return { ok: true as const };

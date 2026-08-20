@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -183,7 +183,11 @@ export default async function BlogPostPage({
                     ) : null}
                     <span className="mt-auto inline-flex items-center gap-1.5 pt-3 text-sm font-medium text-primary">
                       Читать
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                      <ChevronRight
+                        className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                        strokeWidth={2.5}
+                        aria-hidden="true"
+                      />
                     </span>
                   </div>
                 </Link>

@@ -1,0 +1,26 @@
+{
+  "name": "russia-regions-map",
+  "version": "1.0.0",
+  "description": "Карта регионов России для React/Next.js: 86 субъектов, подсветка при наведении, острова входят в свой регион",
+  "keywords": ["russia", "map", "svg", "react", "regions"],
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./russia-regions.svg": "./russia-regions.svg"
+  },
+  "files": ["dist", "src", "russia-regions.svg", "README.md"],
+  "sideEffects": false,
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  }
+}

@@ -85,10 +85,19 @@ export default async function EditProductPage(
           regDate: product.regDate
             ? product.regDate.toISOString().slice(0, 10)
             : null,
+          regValidUntil: product.regValidUntil
+            ? product.regValidUntil.toISOString().slice(0, 10)
+            : null,
+          regAuthority: product.regAuthority,
           regUrl: product.regUrl,
+          markingRequired: product.markingRequired,
+          markingCodes: product.markingCodes,
           seoTitle: product.seoTitle,
           seoDesc: product.seoDesc,
           sort: product.sort,
+          showOnHome: product.showOnHome,
+          homeSort: product.homeSort,
+          homeBadge: product.homeBadge,
           images: product.images.map((img) => ({
             id: img.id,
             url: img.url,

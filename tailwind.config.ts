@@ -36,6 +36,8 @@ const config: Config = {
         flame: {
           DEFAULT: "hsl(var(--accent-brand))",
           ink: "hsl(var(--accent-ink))",
+          cta: "var(--accent-cta)",
+          "cta-hover": "var(--accent-cta-hover)",
         },
         /* Тёмные «чернильные» секции: футер, CTA-баннеры */
         ink: {

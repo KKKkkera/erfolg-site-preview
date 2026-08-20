@@ -44,6 +44,8 @@
        --accent-ink: затемнённый для мелкого текста на светлом (5.1:1). */
     --accent-brand: 15 79% 51%;         /* #E55220 */
     --accent-ink: 15 79% 43%;           /* #C44217 */
+    --accent-cta: #ED4C2D;              /* основной цвет крупных CTA */
+    --accent-cta-hover: #D94125;
 
     /* Secondary / Muted / Accent (ховеры) */
     --secondary: 204 26% 96%;
@@ -75,7 +77,7 @@
     /* Поля страницы. --page-gutter — от края экрана до вертикали разметки,
        --page-pad — от вертикали до текста (у Laravel текст не притык к линии).
        Паддинг контейнера = сумма обоих, см. tailwind.config.ts. */
-    --page-gutter: 1rem;
+    --page-gutter: 0rem;
     --page-pad: 1.25rem;
     --page-max: 1400px;
 
@@ -100,7 +102,42 @@
     :root { --page-gutter: 2rem; --page-pad: 2.5rem; }
   }
 
-  html { scroll-behavior: auto; }       /* без smooth — заказчик не хочет анимаций */
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
+  }
+  /* Плавная докрутка для переходов по якорям и программного скролла.
+     На колесо мыши это не влияет — там шаг задаёт браузер. */
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  /* Место под полосу прокрутки держим всегда — тогда её пропажа не двигает
+     вёрстку вбок. */
+  html { scrollbar-gutter: stable; }
+  /* Radix (Select, Dialog) на время открытия вешает на body
+     `overflow: hidden` и отступ вместо полосы прокрутки. От overflow body
+     становится прокручиваемым контейнером, а `sticky top-0` отсчитывает
+     положение от ближайшего такого контейнера — шапка прилипала к началу
+     документа и уезжала выше экрана. Прокрутку Radix глушит ещё и
+     обработчиками колеса/тача, поэтому CSS-часть блокировки снимаем. */
+  html body[data-scroll-locked] {
+    overflow: visible !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+  /* Блокировку переносим на html: обработчики колеса от Radix пропускают
+     событие, если курсор стоит над полем ввода (input/textarea считаются
+     прокручиваемыми), и страница за модалкой уезжала. html прокрутку
+     останавливает целиком, при этом не становится контейнером для sticky —
+     в отличие от body, из-за чего блокировка на body и была снята.
+     Место под полосу держит scrollbar-gutter, так что вёрстка не прыгает. */
+  html:has(body[data-scroll-locked]) {
+    overflow: hidden !important;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "tnum" 0;
@@ -130,7 +167,7 @@
   }
 
   .guide-border {
-    border-color: hsl(var(--guide) / 0.3);
+    border-color: hsl(var(--guide) / 0.18);
   }
 
   /* Вертикали по краям колонки контента.
@@ -149,7 +186,7 @@
     top: 0;
     bottom: 0;
     width: 1px;
-    background-color: hsl(var(--guide) / 0.24);
+    background-color: hsl(var(--guide) / 0.14);
     pointer-events: none;
   }
   .rails::before {
@@ -157,6 +194,13 @@
   }
   .rails::after {
     left: calc(50% + var(--col));
+  }
+
+  /* Направляющие поверх содержимого секции: линии проходят по картинке
+     карусели городов и режут её, а не прячутся под ней. */
+  .rails-over::before,
+  .rails-over::after {
+    z-index: 30;
   }
 
   /* Оранжевые засечки на пересечении вертикали и горизонтали секции.
@@ -225,6 +269,7 @@
   }
 
   /* На стыке героя нужна только левая точка: справа вертикаль начинается ниже ленты. */
+  .hero-boundary-marks::before,
   .hero-boundary-marks::after {
     display: none;
   }
@@ -249,6 +294,24 @@
   .brand-strip-mark-br {
     bottom: -3px;
     right: calc(var(--brand-strip-rail-offset) - 3px);
+  }
+
+  @media (max-width: 639px) {
+    .rails::after {
+      left: auto;
+      right: 0;
+    }
+    .marks::before,
+    .marks-t::before,
+    .brand-strip-mark-tl,
+    .brand-strip-mark-bl {
+      left: 0;
+    }
+    .marks::after,
+    .marks-t::after,
+    .brand-strip-mark-br {
+      right: 0;
+    }
   }
 
   /* Короткое белое затухание скрывает жёсткий вход и выход логотипов. */

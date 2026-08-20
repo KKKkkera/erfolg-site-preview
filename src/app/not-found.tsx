@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, FileQuestion } from "lucide-react";
+import { ChevronRight, FileQuestion } from "lucide-react";
 
 import { SiteHeader } from "@/components/public/site-header";
 import { SiteFooter } from "@/components/public/site-footer";
-import { PulseLine } from "@/components/public/decor";
 import { Button } from "@/components/ui/button";
-import { QuoteRequestDialog } from "@/components/public/quote-request-dialog";
+import { LeadDialog } from "@/components/public/lead-dialog";
 import { Toaster } from "@/components/ui/sonner";
 
 const QUICK_LINKS = [
@@ -35,9 +34,6 @@ export default async function NotFound() {
           <p className="mt-7 font-heading text-6xl font-semibold leading-none tracking-tight text-flame-ink">
             404
           </p>
-          <div className="mt-4 w-full max-w-[16rem]">
-            <PulseLine className="h-6 text-border" />
-          </div>
           <h1 className="mt-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             Такой страницы нет
           </h1>
@@ -53,7 +49,7 @@ export default async function NotFound() {
                 <Button asChild variant="outline">
                   <Link href={link.href}>
                     {link.label}
-                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                    <ChevronRight className="ml-1.5 h-4 w-4" strokeWidth={2.5} />
                   </Link>
                 </Button>
               </li>
@@ -61,7 +57,7 @@ export default async function NotFound() {
           </ul>
 
           <div className="mt-8">
-            <QuoteRequestDialog
+            <LeadDialog
               source="not-found"
               triggerSize="lg"
               triggerVariant="accent"

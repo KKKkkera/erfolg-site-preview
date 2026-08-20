@@ -57,14 +57,24 @@ const COMPLIANCE_FIELDS: SettingFieldDef[] = [
     label: "Дата уведомления Роскомнадзора",
     placeholder: "YYYY-MM-DD",
     description:
-      "Дата подачи уведомления об обработке ПДн в реестр операторов ПДн (152-ФЗ).",
+      "Дата подачи уведомления об обработке персональных данных в реестр операторов персональных данных (152-ФЗ).",
   },
   {
     key: "compliance.rkn_notification_number",
-    label: "Номер в реестре операторов ПДн",
+    label: "Номер в реестре операторов персональных данных",
     placeholder: "XX-XX-XXXXXX",
     description:
       "Номер записи после внесения в реестр Роскомнадзора. Заполняется после публикации сайта.",
+  },
+];
+
+const HOME_FIELDS: SettingFieldDef[] = [
+  {
+    key: "home.bento_autoplay_seconds",
+    label: "Автолистание «Новинок», секунд",
+    placeholder: "6",
+    description:
+      "Через сколько секунд карусель спецпредложений сама перелистывает слайд. Допустимо от 2 до 60; пусто — 6 секунд. Ноль отключает автолистание.",
   },
 ];
 
@@ -150,8 +160,15 @@ export default async function AdminSettingsPage() {
           />
           <SettingsCardForm
             title="Соответствие требованиям (152-ФЗ)"
-            description="Реквизиты уведомления об обработке ПДн в Роскомнадзор."
+            description="Реквизиты уведомления об обработке персональных данных в Роскомнадзор."
             fields={COMPLIANCE_FIELDS}
+            initial={map}
+            s3Configured={s3}
+          />
+          <SettingsCardForm
+            title="Главная страница"
+            description="Поведение блока «Новинки и спецпредложения»."
+            fields={HOME_FIELDS}
             initial={map}
             s3Configured={s3}
           />

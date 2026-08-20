@@ -1,10 +1,10 @@
+import Image from "next/image";
 import { Quote } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
 import { SectionTag } from "@/components/public/decor";
 import { EmptyState } from "@/components/public/empty-state";
-import { ReviewForm } from "@/components/public/review-form";
 import { JsonLd } from "@/components/seo/json-ld";
 import { defaultMetadata } from "@/lib/seo";
 import { breadcrumbListSchema } from "@/lib/schema";
@@ -15,33 +15,35 @@ export const revalidate = 300;
 export const metadata = defaultMetadata({
   title: "Отзывы клиник о сервисе и поставке медтехники",
   description:
-    "Отзывы медицинских организаций о поставке и обслуживании оборудования ООО «Эрфольг». Публикуем только после подтверждения автором.",
+    "Отзывы медицинских организаций о поставке и обслуживании оборудования ООО «Эрфольг».",
   path: "/reviews",
 });
 
 type PublicReview = {
   id: string;
   authorName: string;
+  position: string | null;
   city: string | null;
   organization: string | null;
-  showOrganization: boolean;
   text: string;
+  imageUrl: string | null;
   publishedAt: Date | null;
 };
 
 async function loadReviews(): Promise<PublicReview[]> {
   return withTimeoutFallback(
     db.review.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      where: { isPublished: true },
+      orderBy: [{ sort: "asc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
       take: 50,
       select: {
         id: true,
         authorName: true,
+        position: true,
         city: true,
         organization: true,
-        showOrganization: true,
         text: true,
+        imageUrl: true,
         publishedAt: true,
       },
     }),
@@ -74,9 +76,8 @@ export default async function ReviewsPage() {
               Отзывы клиник
             </h1>
             <p className="mt-4 text-base leading-7 text-muted-foreground">
-              Отзывы публикуем после согласования с автором. Каждый — от
-              организации, которой мы поставляли оборудование или обслуживали
-              парк.
+              Каждый отзыв — от организации, которой мы поставляли оборудование
+              или обслуживали парк. Публикуем с согласия автора
             </p>
           </div>
         </div>
@@ -86,8 +87,12 @@ export default async function ReviewsPage() {
         {reviews.length > 0 ? (
           <ul className="grid gap-5 md:grid-cols-2">
             {reviews.map((review) => {
-              const org = review.showOrganization ? review.organization : null;
-              const meta = [org, review.city, formatDate(review.publishedAt)]
+              const meta = [
+                review.position,
+                review.organization,
+                review.city,
+                formatDate(review.publishedAt),
+              ]
                 .filter(Boolean)
                 .join(" · ");
               return (
@@ -95,10 +100,31 @@ export default async function ReviewsPage() {
                   key={review.id}
                   className="flex flex-col rounded-lg border border-border bg-white p-6"
                 >
-                  <Quote
-                    className="h-5 w-5 shrink-0 text-flame-ink"
-                    aria-hidden="true"
-                  />
+                  {review.imageUrl ? (
+                    /* Скан письма — иллюстрация к тексту: сам текст ниже
+                       лежит в разметке целиком и индексируется. */
+                    <a
+                      href={review.imageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="relative block h-64 overflow-hidden rounded border border-border bg-surface transition-colors hover:border-primary"
+                    >
+                      <Image
+                        src={review.imageUrl}
+                        alt={`Благодарственное письмо: ${
+                          review.organization || review.authorName
+                        }`}
+                        fill
+                        sizes="(min-width: 768px) 45vw, 100vw"
+                        className="object-contain object-top p-2"
+                      />
+                    </a>
+                  ) : (
+                    <Quote
+                      className="h-5 w-5 shrink-0 text-flame-ink"
+                      aria-hidden="true"
+                    />
+                  )}
                   <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-foreground">
                     {review.text}
                   </p>
@@ -120,29 +146,9 @@ export default async function ReviewsPage() {
           <EmptyState
             icon={Quote}
             title="Отзывы пока не опубликованы"
-            description="Мы публикуем только отзывы, которые клиника подтвердила письменно. Если вы работали с нами — оставьте отзыв, он появится после проверки."
+            description="Мы публикуем отзывы клиник, которые подтвердили их письменно. Раздел скоро пополнится."
           />
         )}
-      </section>
-
-      <section className="rails border-t guide-border bg-surface">
-        <div className="marks-t container py-14">
-          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-                Оставить отзыв
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Отзыв проходит проверку перед публикацией: сверяем, что поставка
-                или обслуживание действительно были. Название организации
-                публикуем только с вашего согласия.
-              </p>
-            </div>
-            <div className="rounded-lg border border-border bg-white p-6">
-              <ReviewForm />
-            </div>
-          </div>
-        </div>
       </section>
 
       <JsonLd

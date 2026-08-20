@@ -16,7 +16,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  clearConsent,
   readConsent,
   subscribeConsent,
   writeConsent,
@@ -147,7 +146,7 @@ function SettingsButton({
               href="/cookie-policy"
               className="text-primary underline-offset-2 hover:underline"
             >
-              Политика cookie
+              Согласие на cookies
             </Link>
             .
           </DialogDescription>
@@ -223,31 +222,5 @@ function CategoryRow({
         <span className="mt-1 block text-muted-foreground">{description}</span>
       </span>
     </label>
-  );
-}
-
-/**
- * Кнопка «Отозвать согласие» — для размещения внутри страницы /cookie-policy.
- * Очищает ключи в localStorage, диспатчит событие — баннер появляется заново.
- */
-export function RevokeConsentButton() {
-  const [revoked, setRevoked] = useState(false);
-
-  function handleClick() {
-    clearConsent();
-    setRevoked(true);
-  }
-
-  return (
-    <div className="flex flex-col items-start gap-2">
-      <Button type="button" variant="outline" onClick={handleClick}>
-        Отозвать согласие на cookie
-      </Button>
-      {revoked ? (
-        <p className="text-xs text-success">
-          Согласие отозвано. Баннер снова показан внизу страницы.
-        </p>
-      ) : null}
-    </div>
   );
 }

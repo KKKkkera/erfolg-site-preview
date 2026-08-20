@@ -44,6 +44,7 @@ export async function addProductImage(
     });
     revalidatePath(`/admin/products/${data.productId}`);
     revalidatePath("/catalog");
+    revalidatePath("/");
     return {
       ok: true,
       id: created.id,
@@ -71,6 +72,7 @@ export async function removeProductImage(
     });
     revalidatePath(`/admin/products/${img.productId}`);
     revalidatePath("/catalog");
+    revalidatePath("/");
     return { ok: true };
   } catch (e) {
     console.error("removeProductImage error", e);
@@ -107,6 +109,7 @@ export async function reorderProductImages(
     });
     revalidatePath(`/admin/products/${data.productId}`);
     revalidatePath("/catalog");
+    revalidatePath("/");
     return { ok: true };
   } catch (e) {
     console.error("reorderProductImages error", e);

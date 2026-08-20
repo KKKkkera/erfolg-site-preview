@@ -2,7 +2,7 @@ import { Mail, MapPin, Phone, Clock, ExternalLink } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
 import { SectionTag } from "@/components/public/decor";
-import { ContactForm } from "@/components/public/contact-form";
+import { LeadForm } from "@/components/public/lead-form";
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
 import { FORMS_DISABLED } from "@/lib/feature-flags";
@@ -144,7 +144,7 @@ export default async function ContactsPage() {
                 </span>
               </div>
               <div className="p-6">
-                <ContactForm />
+                <LeadForm source="contacts" />
               </div>
             </div>
           </div>
@@ -158,7 +158,7 @@ export default async function ContactsPage() {
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
           Информация для проверки в ЕГРЮЛ и оформления договора.
-          Банковские реквизиты предоставляем в счёте на оплату.
+          Банковские реквизиты предоставляем в счёте на оплату
         </p>
         <dl className="mt-6 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
           {REQUISITES.map((row) => (

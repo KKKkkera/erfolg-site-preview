@@ -12,12 +12,11 @@ export const CMS_SLUGS_WITH_ROUTES = new Set<string>([
   "delivery",
   "warranty",
   "licenses",
+  "license",
   "privacy",
   "personal-data-policy",
   "cookie-policy",
   "consent",
-  "review-consent",
-  "terms",
 ]);
 
 export function hasPublicCmsRoute(slug: string): boolean {
@@ -39,11 +38,11 @@ export function hasPublicCmsRoute(slug: string): boolean {
 export const CODE_MANAGED_CMS_SLUGS = new Set<string>([
   "about",
   "licenses",
+  "license",
   "privacy",
   "personal-data-policy",
   "cookie-policy",
   "consent",
-  "terms",
 ]);
 
 export function isCodeManagedCmsSlug(slug: string): boolean {

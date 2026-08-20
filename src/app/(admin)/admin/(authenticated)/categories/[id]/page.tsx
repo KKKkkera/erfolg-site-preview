@@ -52,8 +52,6 @@ export default async function EditCategoryPage(
           slug: category.slug,
           description: category.description,
           parentId: category.parentId,
-          seoTitle: category.seoTitle,
-          seoDesc: category.seoDesc,
           sort: category.sort,
         }}
         parents={parents}

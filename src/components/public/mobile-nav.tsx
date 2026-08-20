@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Mail, Menu, Phone, Search } from "lucide-react";
+import { ChevronDown, Mail, Menu, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,120 +14,205 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { siteConfig } from "@/lib/site-config";
-import { QuoteRequestDialog } from "@/components/public/quote-request-dialog";
+import { LeadDialog } from "@/components/public/lead-dialog";
+import { SocialLinks } from "@/components/public/social-links";
+import type { CatalogMenuCategory } from "@/components/public/catalog-mega-menu";
+import { cn } from "@/lib/utils";
 import { telHref } from "@/lib/utils-format";
 
-/* Порядок — по частоте обращения закупщика, а не по алфавиту.
-   «О компании» и «Блог» уже есть в основной группе, здесь их не дублируем. */
-const SECONDARY_NAV = siteConfig.nav.info.filter(
-  (item) => item.href !== "/about" && item.href !== "/blog",
-);
+/** Разделы каталога для меню: из базы, а без неё — статический список. */
+function catalogLinks(
+  categories: CatalogMenuCategory[],
+): { href: string; label: string }[] {
+  if (categories.length === 0) return siteConfig.nav.catalog;
+  return categories.map((category) => ({
+    href: `/catalog?category=${encodeURIComponent(category.slug)}`,
+    label: category.name,
+  }));
+}
 
-export function MobileNav() {
+/** Смахнули вправо дальше этого — меню закрывается. */
+const SWIPE_CLOSE_PX = 90;
+
+export function MobileNav({
+  categories,
+}: {
+  categories: CatalogMenuCategory[];
+}) {
   const [open, setOpen] = useState(false);
+  /* «Каталог» раскрывается разделами прямо в меню — то же, что мегаменю
+     на десктопе: видно, что внутри, и можно уйти сразу в раздел. */
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const startX = useRef<number | null>(null);
+  const close = () => setOpen(false);
+  const sections = catalogLinks(categories);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        setDragX(0);
+      }}
+    >
       <SheetTrigger asChild>
         <Button
           variant="outline"
           size="icon"
           aria-label="Открыть меню"
-          className="xl:hidden"
+          className="min-[1120px]:hidden"
         >
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="flex w-full max-w-sm flex-col overflow-y-auto">
-        <SheetHeader>
+
+      {/* Панель на три четверти экрана: за ней видно страницу, и понятно, что
+          меню — слой поверх, а не отдельный экран. Смахивание вправо закрывает:
+          на телефоне это привычнее, чем целиться в крестик. */}
+      <SheetContent
+        side="right"
+        className="flex w-[78%] max-w-sm flex-col gap-0 overflow-y-auto p-0 min-[420px]:w-[72%]"
+        style={
+          dragX > 0
+            ? { transform: `translate3d(${dragX}px, 0, 0)`, transition: "none" }
+            : undefined
+        }
+        onTouchStart={(event) => {
+          startX.current = event.touches[0]?.clientX ?? null;
+        }}
+        onTouchMove={(event) => {
+          if (startX.current === null) return;
+          const delta = (event.touches[0]?.clientX ?? 0) - startX.current;
+          setDragX(delta > 0 ? delta : 0);
+        }}
+        onTouchEnd={() => {
+          if (dragX > SWIPE_CLOSE_PX) close();
+          else setDragX(0);
+          startX.current = null;
+        }}
+      >
+        <SheetHeader className="flex-none border-b border-border px-5 py-4 text-left">
           <SheetTitle className="sr-only">Меню сайта</SheetTitle>
-          <Image
-            src="/brand/erfolg-logo.png"
-            alt="Erfolg Medical Engineering"
-            width={621}
-            height={200}
-            sizes="126px"
-            className="h-9 w-auto self-start"
-          />
+          <Link
+            href="/"
+            onClick={close}
+            aria-label="На главную"
+            className="self-start"
+          >
+            <Image
+              src="/brand/erfolg-logo.png"
+              alt="Erfolg Medical Engineering"
+              width={621}
+              height={200}
+              sizes="126px"
+              className="h-9 w-auto"
+            />
+          </Link>
         </SheetHeader>
 
-        <nav className="mt-6 flex flex-col" aria-label="Основные разделы">
-          {siteConfig.nav.primary.map((item, i) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setOpen(false)}
-              className="flex items-center justify-between rounded-md px-3 py-3 text-[15px] font-medium text-foreground transition-colors hover:bg-accent"
-            >
-              <span className="flex items-center gap-3">
-                <span aria-hidden="true" className="font-mono text-[11px] text-flame-ink">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                {item.label}
-              </span>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-            </Link>
-          ))}
-          {/* Иконка поиска в шапке видна только с lg: — без этого пункта
-              на телефоне до /search было не добраться вообще. */}
-          <Link
-            href="/search"
-            onClick={() => setOpen(false)}
-            className="mt-1 flex items-center gap-3 rounded-md border border-border px-3 py-3 text-[15px] font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            <Search className="h-4 w-4 text-primary" aria-hidden="true" />
-            Поиск по каталогу
-          </Link>
-        </nav>
+        <nav className="flex-none px-5" aria-label="Основные разделы">
+          {siteConfig.nav.primary.map((item) =>
+            item.href === "/catalog" ? (
+              <div key={item.href} className="border-b border-border/70">
+                <button
+                  type="button"
+                  onClick={() => setCatalogOpen((prev) => !prev)}
+                  aria-expanded={catalogOpen}
+                  aria-controls="mobile-catalog-sections"
+                  className="flex w-full items-center justify-between py-4 text-left text-[17px] font-medium text-foreground"
+                >
+                  {item.label}
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
+                      catalogOpen ? "rotate-180" : "rotate-0",
+                    )}
+                    aria-hidden="true"
+                  />
+                </button>
 
-        {/* «Лицензии» и страницы про 44/223-ФЗ — то, ради чего закупщик
-            и заходит. Раньше на телефоне до них можно было добраться только
-            через футер, то есть пролистав всю главную. */}
-        <nav className="mt-6" aria-label="Документы и закупки">
-          <h3 className="tech-label px-3 text-muted-foreground">
-            Документы и закупки
-          </h3>
-          <div className="mt-2 flex flex-col">
-            {SECONDARY_NAV.map((item) => (
+                <div
+                  id="mobile-catalog-sections"
+                  inert={!catalogOpen}
+                  className={cn(
+                    "grid overflow-hidden transition-[grid-template-rows] duration-300 ease-out",
+                    catalogOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                  )}
+                >
+                  <div className="overflow-hidden">
+                    <div className="flex flex-col border-l border-border pb-3 pl-4">
+                      <Link
+                        href="/catalog"
+                        onClick={close}
+                        className="py-2.5 text-[15px] leading-snug text-foreground/80"
+                      >
+                        Весь каталог
+                      </Link>
+                      {sections.map((section) => (
+                        <Link
+                          key={section.href}
+                          href={section.href}
+                          onClick={close}
+                          className="py-2.5 text-[15px] leading-snug text-foreground/80"
+                        >
+                          {section.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setOpen(false)}
-                className="flex items-center justify-between rounded-md px-3 py-2.5 text-sm text-foreground/85 transition-colors hover:bg-accent hover:text-foreground"
+                onClick={close}
+                className="block border-b border-border/70 py-4 text-[17px] font-medium text-foreground last:border-b-0"
               >
                 {item.label}
-                <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               </Link>
-            ))}
-          </div>
+            ),
+          )}
         </nav>
 
-        <div className="mt-auto border-t pt-5">
+        {/* Контакты — продолжение того же списка: та же бумага, те же поля. */}
+        <div className="mt-auto flex-none px-5 pb-6 pt-6">
           <a
             href={telHref(siteConfig.contacts.phonePrimary)}
-            className="flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-accent"
+            className="flex items-center gap-3"
           >
             <Phone className="h-4 w-4 shrink-0 text-flame-ink" aria-hidden="true" />
-            <span className="font-mono text-[15px] font-medium text-foreground">
-              {siteConfig.contacts.phonePrimary}
+            <span>
+              <span className="block font-mono text-[17px] font-semibold leading-tight text-foreground">
+                {siteConfig.contacts.phonePrimary}
+              </span>
+              <span className="mt-1 block font-mono text-[11px] text-muted-foreground">
+                Пн–Пт 09:00–18:00
+              </span>
             </span>
           </a>
+
           <a
             href={`mailto:${siteConfig.contacts.email}`}
-            className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="mt-4 flex items-center gap-3 text-sm text-foreground"
           >
-            <Mail className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Mail className="h-4 w-4 shrink-0 text-flame-ink" aria-hidden="true" />
             {siteConfig.contacts.email}
           </a>
-          <p className="px-3 pt-1 font-mono text-xs text-muted-foreground">
-            Пн–Пт 09:00–18:00
-          </p>
-          <div className="mt-4 px-1 pb-2">
-            <QuoteRequestDialog
+
+          <SocialLinks
+            className="mt-5 gap-2.5"
+            itemClassName="grid h-10 w-10 place-items-center border border-border text-foreground/70 transition-colors hover:border-primary hover:text-foreground"
+            iconClassName="h-[18px] w-[18px]"
+          />
+
+          <div className="mt-5">
+            <LeadDialog
               source="mobile-cta"
               triggerLabel="Получить КП"
               triggerVariant="accent"
-              triggerClassName="w-full"
+              triggerClassName="h-12 w-full text-base"
             />
           </div>
         </div>

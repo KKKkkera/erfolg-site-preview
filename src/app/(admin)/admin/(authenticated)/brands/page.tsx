@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  BrandsSortable,
+  type BrandRow,
+} from "@/components/admin/brands/brands-sortable";
+import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -17,20 +13,27 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Бренды — Эрфольг" };
 
 export default async function AdminBrandsPage() {
-  let rows: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    country: string | null;
-    website: string | null;
-    _count: { products: number };
-  }> = [];
+  let rows: BrandRow[] = [];
   let dbError = false;
+
   try {
-    rows = await db.brand.findMany({
-      orderBy: { name: "asc" },
-      include: { _count: { select: { products: true } } },
+    const brands = await db.brand.findMany({
+      orderBy: [{ sort: "asc" }, { name: "asc" }],
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        country: true,
+        website: true,
+        logo: true,
+        sort: true,
+        _count: { select: { products: true } },
+      },
     });
+    rows = brands.map(({ _count, ...brand }) => ({
+      ...brand,
+      productsCount: _count.products,
+    }));
   } catch (e) {
     console.error("admin/brands list error", e);
     dbError = true;
@@ -61,52 +64,12 @@ export default async function AdminBrandsPage() {
           Брендов пока нет.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-md border bg-background">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Название</TableHead>
-                <TableHead className="w-[160px]">Страна</TableHead>
-                <TableHead className="w-[200px]">Сайт</TableHead>
-                <TableHead className="w-[110px] text-center">Товаров</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((b) => (
-                <TableRow key={b.id}>
-                  <TableCell>
-                    <Link
-                      href={`/admin/brands/${b.id}`}
-                      className="font-medium hover:underline"
-                    >
-                      {b.name}
-                    </Link>
-                    <div className="text-xs text-muted-foreground">/{b.slug}</div>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {b.country || "—"}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {b.website ? (
-                      <a
-                        href={b.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:underline"
-                      >
-                        {b.website}
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </TableCell>
-                  <TableCell className="text-center text-sm">
-                    {b._count.products}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Перетаскивайте строки за значок слева. В этом же порядке бренды
+            прокручиваются на главной странице.
+          </p>
+          <BrandsSortable rows={rows} />
         </div>
       )}
     </div>

@@ -29,7 +29,7 @@ export default async function ConsentPage() {
       fallbackTitle="Согласие на обработку персональных данных"
       breadcrumbs={[
         { href: "/", label: "Главная" },
-        { label: "Согласие на обработку ПДн" },
+        { label: "Согласие на обработку персональных данных" },
       ]}
     >
       <p>

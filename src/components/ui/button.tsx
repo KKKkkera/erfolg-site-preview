@@ -10,15 +10,14 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary-dark",
-        /* Сигнальный оранжевый логотипа #E55220 — главный CTA («Получить КП»).
-           Заливка ровно фирменным цветом; с белым текстом 3.8:1 —
-           ниже AA 4.5:1 для 14px, ховер уводит в затемнённый flame-ink. */
+        /* Приглушённый оранжевый сохраняет связь с логотипом, но не спорит
+           с контентом; более тёмный ховер усиливает состояние наведения. */
         accent:
-          "bg-flame text-white hover:bg-flame-ink focus-visible:ring-flame-ink",
+          "bg-flame-cta text-white hover:bg-flame-cta-hover focus-visible:ring-flame-cta-hover",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-input bg-transparent hover:border-primary hover:text-primary",
+          "border border-input bg-transparent hover:bg-accent hover:text-foreground",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-accent",
         ghost: "hover:bg-accent hover:text-accent-foreground",

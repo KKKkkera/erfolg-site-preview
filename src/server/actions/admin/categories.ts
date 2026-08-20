@@ -14,8 +14,6 @@ const CategoryInput = z.object({
   slug: z.string().trim().max(120).optional().or(z.literal("")),
   description: z.string().trim().max(2000).optional().or(z.literal("")),
   parentId: z.string().trim().optional().or(z.literal("")),
-  seoTitle: z.string().trim().max(200).optional().or(z.literal("")),
-  seoDesc: z.string().trim().max(400).optional().or(z.literal("")),
   sort: z.coerce.number().int().min(0).max(100000).default(0),
 });
 
@@ -59,8 +57,6 @@ export async function saveCategory(
     slug,
     description: data.description?.trim() ? data.description.trim() : null,
     parentId: data.parentId?.trim() ? data.parentId.trim() : null,
-    seoTitle: data.seoTitle?.trim() ? data.seoTitle.trim() : null,
-    seoDesc: data.seoDesc?.trim() ? data.seoDesc.trim() : null,
     sort: data.sort,
   };
 

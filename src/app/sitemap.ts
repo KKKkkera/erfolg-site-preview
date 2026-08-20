@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
 
-import { getCatalogSlugs, getCategorySlugs } from "@/lib/sitemap-data";
+import { getCatalogSlugs } from "@/lib/sitemap-data";
 import { db, isDatabaseConfigured } from "@/lib/db";
 
 // Генерировать на запросе, а не на билде. Иначе Next пререндерит sitemap
-// в Docker-сборке, где БД недоступна, все три try/catch молча падают,
+// на этапе сборки, где БД недоступна, все три try/catch молча падают,
 // и в прод уезжает карта только из статических маршрутов — без единой
 // категории, товара и статьи (было ровно 26 URL вместо ~70).
 export const dynamic = "force-dynamic";
@@ -32,14 +32,14 @@ const STATIC_ROUTES: StaticEntry[] = [
   { path: "/catalog", priority: 0.9, changeFrequency: "weekly" },
   { path: "/blog", priority: 0.8, changeFrequency: "weekly" },
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/44-fz", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/223-fz", priority: 0.7, changeFrequency: "monthly" },
   { path: "/service", priority: 0.7, changeFrequency: "monthly" },
   { path: "/about", priority: 0.7, changeFrequency: "monthly" },
   { path: "/contacts", priority: 0.7, changeFrequency: "monthly" },
   { path: "/reviews", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/works", priority: 0.6, changeFrequency: "monthly" },
   { path: "/delivery", priority: 0.5, changeFrequency: "monthly" },
   { path: "/warranty", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/license", priority: 0.5, changeFrequency: "yearly" },
   { path: "/licenses", priority: 0.5, changeFrequency: "monthly" },
 ];
 
@@ -57,12 +57,10 @@ const REGIONAL_CITIES = [
 ];
 
 const LEGAL_ROUTES: StaticEntry[] = [
-  { path: "/terms", priority: 0.3, changeFrequency: "yearly" },
   { path: "/privacy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/personal-data-policy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/cookie-policy", priority: 0.3, changeFrequency: "yearly" },
   { path: "/consent", priority: 0.3, changeFrequency: "yearly" },
-  { path: "/review-consent", priority: 0.3, changeFrequency: "yearly" },
 ];
 
 function abs(path: string): string {
@@ -86,27 +84,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // Категории
-  try {
-    const categories = await getCategorySlugs();
-    for (const c of categories) {
-      entries.push({
-        url: abs(`/catalog/${c.slug}`),
-        lastModified: c.updatedAt,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      });
-    }
-  } catch (e) {
-    console.error("sitemap/categories error", e);
-  }
-
   // Товары
   try {
     const products = await getCatalogSlugs();
     for (const p of products) {
       entries.push({
-        url: abs(`/catalog/${p.categorySlug}/${p.productSlug}`),
+        url: abs(`/catalog/${p.productSlug}`),
         lastModified: p.updatedAt,
         changeFrequency: "weekly",
         priority: 0.7,

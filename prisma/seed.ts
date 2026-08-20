@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { getStaticCmsPage } from "../src/lib/static-cms-pages";
 import { seedBlogPosts } from "./seeds/blog-posts";
 import { seedBrands } from "./seeds/brands";
+import { seedWorks } from "./seeds/works";
 
 const db = new PrismaClient();
 
@@ -262,6 +263,13 @@ async function seedBrandsStep() {
   console.log(`✓ brands: ${count}`);
 }
 
+// ─────────────────────── 4.6 Works (клиенты на главной) ───────────────────────
+
+async function seedWorksStep() {
+  const count = await seedWorks(db);
+  console.log(`✓ works: ${count}`);
+}
+
 // ─────────────────────── 5. Settings (defaults) ───────────────────────
 
 const settings: Array<{ key: string; value: Prisma.InputJsonValue }> = [
@@ -341,6 +349,7 @@ async function main() {
   await seedBrandsStep();
   await seedPages();
   await seedBlog();
+  await seedWorksStep();
   await seedSettings();
   console.log("✓ done.");
 }

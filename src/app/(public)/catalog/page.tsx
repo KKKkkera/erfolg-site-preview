@@ -1,10 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import Link from "next/link";
-import { Wrench, Pill, Cog } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
-import { SectionTag } from "@/components/public/decor";
 import { ProductCard } from "@/components/public/product-card";
 import { CatalogFilters } from "@/components/public/catalog-filters";
 import { CatalogPagination } from "@/components/public/catalog-pagination";
@@ -37,29 +35,14 @@ function pickArr(v: string | string[] | undefined): string[] {
   return Array.isArray(v) ? v : [v];
 }
 
-const KIND_CARDS = [
-  {
-    href: "/catalog?kind=EQUIPMENT",
-    icon: Wrench,
-    code: "EQ",
-    title: "Оборудование",
-    text: "Стационарное и мобильное — от УЗИ до КТ/МРТ, реанимация, хирургия, лаборатория.",
-  },
-  {
-    href: "/catalog?kind=CONSUMABLE",
-    icon: Pill,
-    code: "CONS",
-    title: "Расходные материалы",
-    text: "Регулярные поставки расходников по согласованному графику и спецификациям.",
-  },
-  {
-    href: "/catalog?kind=SPARE_PART",
-    icon: Cog,
-    code: "SPARE",
-    title: "Запчасти",
-    text: "Оригинальные запчасти под конкретную модель — даже снятые с производства.",
-  },
-];
+function productCountWord(count: number): string {
+  const lastTwo = count % 100;
+  if (lastTwo >= 11 && lastTwo <= 14) return "товаров";
+  const last = count % 10;
+  if (last === 1) return "товар";
+  if (last >= 2 && last <= 4) return "товара";
+  return "товаров";
+}
 
 export default async function CatalogPage(
   props: {
@@ -71,6 +54,7 @@ export default async function CatalogPage(
   const selectedBrand = pickStr(searchParams.brand);
   const selectedKind = pickStr(searchParams.kind);
   const selectedCondition = pickStr(searchParams.condition);
+  const selectedQuery = (pickStr(searchParams.q) ?? "").trim();
   const pageRaw = parseInt(pickStr(searchParams.page) ?? "1", 10);
   const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
 
@@ -102,6 +86,7 @@ export default async function CatalogPage(
           brandSlug: selectedBrand,
           kind: selectedKind,
           condition: selectedCondition,
+          query: selectedQuery,
           page,
         }),
         {
@@ -116,6 +101,12 @@ export default async function CatalogPage(
   }
 
   const totalPages = Math.max(1, Math.ceil(products.total / PAGE_SIZE));
+  const hasActiveFilters =
+    selectedCategories.length > 0 ||
+    Boolean(selectedBrand) ||
+    Boolean(selectedKind) ||
+    Boolean(selectedCondition) ||
+    selectedQuery.length >= 2;
 
   return (
     <>
@@ -141,49 +132,8 @@ export default async function CatalogPage(
       <Breadcrumbs items={[{ href: "/", label: "Главная" }, { label: "Каталог" }]} />
 
       <section className="rails container pb-16">
-        <div className="max-w-3xl">
-          <SectionTag>Каталог</SectionTag>
-          <h1 className="mt-5 text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[2rem]">
-            Каталог медицинского оборудования
-          </h1>
-          <p className="mt-4 text-base leading-7 text-muted-foreground">
-            Оборудование, расходные материалы и запчасти для реанимации,
-            диагностики, хирургии, лабораторий. Каждое поставляемое изделие
-            имеет действующее регистрационное удостоверение Росздравнадзора —
-            номер подтверждаем в КП и проверяем по Государственному реестру
-            медицинских изделий. Работаем по 44/223-ФЗ. Цена и срок поставки
-            фиксируются в КП по конкретной поставке.
-          </p>
-        </div>
-
-        <div className="mt-8 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
-          {KIND_CARDS.map((card) => (
-            <Link
-              key={card.href}
-              href={card.href}
-              className="group flex items-start gap-3.5 bg-white p-5 transition-colors hover:bg-surface/60"
-            >
-              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md border border-border bg-surface text-primary transition-colors group-hover:border-primary/50">
-                <card.icon className="h-4 w-4" aria-hidden="true" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-baseline justify-between gap-3">
-                  <p className="text-sm font-semibold text-foreground">
-                    {card.title}
-                  </p>
-                  <span aria-hidden="true" className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-flame-ink">
-                    {card.code}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  {card.text}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="mt-10 grid items-start gap-8 lg:grid-cols-[260px_1fr]">
+        <h1 className="sr-only">Каталог медицинского оборудования</h1>
+        <div className="grid items-start gap-8 lg:grid-cols-[260px_1fr]">
           <CatalogFilters
             categories={categories}
             brands={brands}
@@ -196,10 +146,29 @@ export default async function CatalogPage(
           <div>
             {products.items.length > 0 ? (
               <>
-                <p className="tech-label text-muted-foreground">
-                  Показано {products.items.length} из {products.total} товаров
-                </p>
-                <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="flex items-center gap-3">
+                  <p className="tech-label text-muted-foreground">
+                    {hasActiveFilters ? (
+                      <>
+                        Найдено {products.total} {productCountWord(products.total)}
+                      </>
+                    ) : (
+                      <>
+                        Показано {products.items.length} из {products.total} товаров
+                      </>
+                    )}
+                  </p>
+                  {hasActiveFilters ? (
+                    <Link
+                      href="/catalog"
+                      scroll={false}
+                      className="shrink-0 text-xs font-medium text-flame-ink transition-colors hover:text-flame-ink/80"
+                    >
+                      Сбросить
+                    </Link>
+                  ) : null}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
                   {products.items.map((p) => (
                     <ProductCard key={p.id} product={p} />
                   ))}
@@ -213,8 +182,16 @@ export default async function CatalogPage(
               </>
             ) : (
               <EmptyState
-                title="Подбор по запросу"
-                description="По выбранным параметрам позиций нет. Напишите, какое оборудование нужно, — подберём под задачу и пришлём КП."
+                title={
+                  selectedQuery.length >= 2
+                    ? "По запросу ничего не найдено"
+                    : "Подбор по запросу"
+                }
+                description={
+                  selectedQuery.length >= 2
+                    ? `По запросу «${selectedQuery}» позиций нет. Попробуйте изменить формулировку или сбросить фильтры.`
+                    : "По выбранным параметрам позиций нет. Напишите, какое оборудование нужно, — подберём под задачу и пришлём КП."
+                }
                 quoteCta={{ label: "Получить КП", source: "catalog-empty" }}
               />
             )}
@@ -292,15 +269,25 @@ async function loadProducts({
   brandSlug,
   kind,
   condition,
+  query,
   page,
 }: {
   categorySlugs: string[];
   brandSlug?: string;
   kind?: string;
   condition?: string;
+  query?: string;
   page: number;
 }) {
   const where: Prisma.ProductWhereInput = { status: "ACTIVE" };
+  if (query && query.length >= 2) {
+    where.OR = [
+      { name: { contains: query, mode: "insensitive" } },
+      { sku: { contains: query, mode: "insensitive" } },
+      { model: { contains: query, mode: "insensitive" } },
+      { shortDesc: { contains: query, mode: "insensitive" } },
+    ];
+  }
   if (categorySlugs.length > 0) {
     // В фильтре стоят категории верхнего уровня, а товары лежат в подкатегориях
     // («Реанимация» → «Аппараты ИВЛ»). Совпадение по точному slug давало пустую

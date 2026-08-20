@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PackageSearch, type LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { QuoteRequestDialog } from "@/components/public/quote-request-dialog";
+import { LeadDialog } from "@/components/public/lead-dialog";
 
 type EmptyStateProps = {
   icon?: LucideIcon;
@@ -51,7 +51,7 @@ export function EmptyState({
       {(cta || secondaryCta || quoteCta) && (
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           {quoteCta ? (
-            <QuoteRequestDialog
+            <LeadDialog
               source={quoteCta.source}
               triggerLabel={quoteCta.label}
             />

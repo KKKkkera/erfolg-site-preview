@@ -40,7 +40,7 @@ export const siteConfig = {
     tomiLastOrder: "№ 9174 от 14.12.2023",
     // Ссылка на проверку лицензии в открытом реестре Росздравнадзора
     tomiRegistryUrl: "https://roszdravnadzor.gov.ru/services/licenses",
-    // Регистрация в реестре операторов ПДн Роскомнадзора
+    // Регистрация в реестре операторов персональных данных Роскомнадзора
     rknRegistryNumber: "20-25-004617",
     rknRegistryDate: "2025-06-01",
     rknRegistryOrder: "№ 47 от 05.06.2025",
@@ -48,38 +48,38 @@ export const siteConfig = {
   nav: {
     primary: [
       { href: "/catalog", label: "Каталог" },
-      { href: "/service", label: "Сервис и поддержка" },
-      { href: "/blog", label: "Блог" },
-      { href: "/about", label: "Компания" },
+      { href: "/service", label: "Сервис" },
+      { href: "/reviews", label: "Отзывы" },
+      { href: "/licenses", label: "Документы" },
+      { href: "/about", label: "О компании" },
       { href: "/contacts", label: "Контакты" },
     ],
+    /* Отдельных страниц категорий нет: раздел — это каталог с выставленным
+       фильтром. Slug после ?category= должен совпадать со slug в базе. */
     catalog: [
-      { href: "/catalog/reanimation", label: "Реанимация и интенсивная терапия" },
-      { href: "/catalog/diagnostics", label: "Диагностика" },
-      { href: "/catalog/surgery", label: "Хирургия и операционная" },
-      { href: "/catalog/ophthalmology-ent", label: "Офтальмология и ЛОР" },
-      { href: "/catalog/laboratory", label: "Лабораторное оборудование" },
-      { href: "/catalog/consumables", label: "Расходники" },
-      { href: "/catalog/spare-parts", label: "Запчасти" },
+      { href: "/catalog?category=reanimation", label: "Реанимация и интенсивная терапия" },
+      { href: "/catalog?category=diagnostics", label: "Диагностика" },
+      { href: "/catalog?category=surgery", label: "Хирургия и операционная" },
+      { href: "/catalog?category=ophthalmology-ent", label: "Офтальмология и ЛОР" },
+      { href: "/catalog?category=laboratory", label: "Лабораторное оборудование" },
+      { href: "/catalog?category=consumables", label: "Расходники" },
+      { href: "/catalog?category=spare-parts", label: "Запчасти" },
     ],
     info: [
       { href: "/about", label: "О компании" },
       { href: "/blog", label: "Блог" },
       { href: "/reviews", label: "Отзывы" },
       { href: "/faq", label: "Частые вопросы" },
-      { href: "/44-fz", label: "Закупки по 44-ФЗ" },
-      { href: "/223-fz", label: "Закупки по 223-ФЗ" },
       { href: "/delivery", label: "Доставка" },
       { href: "/warranty", label: "Гарантия" },
-      { href: "/licenses", label: "Лицензии" },
+      { href: "/license", label: "Лицензия" },
+      { href: "/licenses", label: "Документы" },
     ],
     legal: [
-      { href: "/terms", label: "Пользовательское соглашение" },
       { href: "/privacy", label: "Политика конфиденциальности" },
-      { href: "/personal-data-policy", label: "Политика обработки ПДн" },
-      { href: "/consent", label: "Согласие на обработку ПДн" },
-      { href: "/review-consent", label: "Согласие на публикацию отзыва" },
-      { href: "/cookie-policy", label: "Политика cookie" },
+      { href: "/personal-data-policy", label: "Политика обработки персональных данных" },
+      { href: "/consent", label: "Согласие на обработку персональных данных" },
+      { href: "/cookie-policy", label: "Согласие на обработку файлов cookies" },
     ],
   },
 };

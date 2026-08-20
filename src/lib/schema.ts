@@ -183,9 +183,7 @@ export function localBusinessSchema(
  * Product — карточка товара.
  */
 export function productSchema(product: ProductLike): object {
-  const url = product.category?.slug
-    ? abs(`/catalog/${product.category.slug}/${product.slug}`)
-    : abs(`/catalog/${product.slug}`);
+  const url = abs(`/catalog/${product.slug}`);
   const description =
     product.shortDesc ??
     product.fullDesc?.replace(/<[^>]+>/g, "").slice(0, 300) ??
@@ -353,7 +351,7 @@ export function itemListSchema(input: {
 }
 
 /**
- * Service — для /service, /44-fz, /223-fz, /delivery.
+ * Service — для /service, /delivery.
  */
 export function serviceSchema(input: {
   name: string;
@@ -416,7 +414,7 @@ export function organizationWithCredentialSchema(): object {
 }
 
 /**
- * WebSite — для главной, с SearchAction на /search.
+ * WebSite — для главной, с SearchAction на фильтрацию каталога.
  */
 export function webSiteSchema(siteUrl: string = SITE_URL): object {
   return {
@@ -430,7 +428,7 @@ export function webSiteSchema(siteUrl: string = SITE_URL): object {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+        urlTemplate: `${siteUrl}/catalog?q={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },

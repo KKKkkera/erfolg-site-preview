@@ -1,84 +1,57 @@
 "use client";
 
-import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 
-import { cn } from "@/lib/utils";
-
-type Manufacturer = {
+export type BrandStripItem = {
+  slug: string;
   name: string;
-  logo: {
-    src: string;
-    width: number;
-    height: number;
-    className?: string;
-  };
+  logo: string | null;
+  /* Число опубликованных товаров бренда. Ноль → плитка не кликабельна:
+     фильтр каталога по такому бренду открывает пустую выдачу, а лента
+     из 35 логотипов дала бы 28 таких тупиков. */
+  productCount: number;
 };
 
-const MANUFACTURERS: Manufacturer[] = [
-  {
-    name: "Севкаврентген-Д",
-    logo: {
-      src: "/images/brands/sevkavrentgen-d.svg",
-      width: 331,
-      height: 48,
-      className: "max-w-[184px]",
-    },
-  },
-  {
-    name: "Mindray",
-    logo: {
-      src: "/images/brands/mindray.png",
-      width: 300,
-      height: 102,
-    },
-  },
-  {
-    name: "GE HealthCare",
-    logo: {
-      src: "/images/brands/ge-healthcare.svg",
-      width: 144,
-      height: 32,
-    },
-  },
-  {
-    name: "OLYMPUS",
-    logo: {
-      src: "/images/brands/olympus.svg",
-      width: 850,
-      height: 159,
-    },
-  },
-  {
-    name: "KARL STORZ",
-    logo: {
-      src: "/images/brands/karl-storz.webp",
-      width: 1920,
-      height: 679,
-    },
-  },
-  {
-    name: "Dräger",
-    logo: {
-      src: "/images/brands/draeger.webp",
-      width: 1920,
-      height: 800,
-    },
-  },
-  {
-    name: "HAMILTON MEDICAL",
-    logo: {
-      src: "/images/brands/hamilton-medical.svg",
-      width: 1800,
-      height: 345,
-    },
-  },
-];
+const MARQUEE_SPEED = 63;
+const MARQUEE_HOVER_SPEED = MARQUEE_SPEED / 2;
+const SPEED_EASING = 8;
+
+function BrandInner({
+  manufacturer,
+  hidden,
+}: {
+  manufacturer: BrandStripItem;
+  hidden: boolean;
+}) {
+  if (manufacturer.logo) {
+    return (
+      <span className="block h-8 w-36">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={manufacturer.logo}
+          alt={manufacturer.name}
+          className="block h-full w-full object-contain opacity-100 grayscale-0 transition duration-300 md:opacity-65 md:grayscale md:group-hover:opacity-100 md:group-hover:grayscale-0"
+          loading={hidden ? "lazy" : "eager"}
+          decoding="async"
+        />
+      </span>
+    );
+  }
+
+  return (
+    <span className="max-w-[190px] text-center font-heading text-[15px] font-semibold leading-tight tracking-[-0.02em] text-foreground/70 transition-colors duration-300 group-hover:text-foreground md:text-base">
+      {manufacturer.name}
+    </span>
+  );
+}
 
 function ManufacturerList({
+  manufacturers,
   listRef,
   hidden = false,
 }: {
+  manufacturers: BrandStripItem[];
   listRef?: React.RefObject<HTMLUListElement | null>;
   hidden?: boolean;
 }) {
@@ -88,35 +61,42 @@ function ManufacturerList({
       className="flex shrink-0 items-stretch"
       aria-hidden={hidden ? "true" : undefined}
     >
-      {MANUFACTURERS.map((manufacturer) => (
-        <li
-          key={`${hidden ? "clone-" : ""}${manufacturer.name}`}
-          className="group flex h-32 w-[224px] shrink-0 items-center justify-center border-r guide-border px-7 text-foreground/75 transition-colors duration-300 hover:text-foreground md:h-36 md:w-[248px]"
-          title={manufacturer.name}
-        >
-          <Image
-            src={manufacturer.logo.src}
-            alt={manufacturer.name}
-            width={manufacturer.logo.width}
-            height={manufacturer.logo.height}
-            className={cn(
-              "max-h-11 w-auto max-w-[170px] object-contain opacity-65 grayscale transition duration-300 group-hover:opacity-100 group-hover:grayscale-0",
-              manufacturer.logo.className,
+      {manufacturers.map((manufacturer) => {
+        const clickable = manufacturer.productCount > 0;
+        const cell =
+          "flex h-full w-full items-center justify-center px-7 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring";
+
+        return (
+          <li
+            key={`${hidden ? "clone-" : ""}${manufacturer.slug}`}
+            className="group flex h-20 w-[208px] shrink-0 items-stretch border-r guide-border md:h-24 md:w-[232px]"
+            title={manufacturer.name}
+          >
+            {clickable ? (
+              <Link
+                href={`/catalog?brand=${manufacturer.slug}`}
+                className={cell}
+                aria-label={`Каталог: ${manufacturer.name}`}
+                tabIndex={hidden ? -1 : undefined}
+              >
+                <BrandInner manufacturer={manufacturer} hidden={hidden} />
+              </Link>
+            ) : (
+              <span className={cell}>
+                <BrandInner manufacturer={manufacturer} hidden={hidden} />
+              </span>
             )}
-            unoptimized={manufacturer.logo.src.endsWith(".svg")}
-          />
-        </li>
-      ))}
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-export function BrandStrip() {
+export function BrandStrip({ brands }: { brands: BrandStripItem[] }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const firstListRef = useRef<HTMLUListElement>(null);
-  const targetSpeedRef = useRef(42);
-  const ignoreHoverRef = useRef(false);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -129,9 +109,10 @@ export function BrandStrip() {
 
     let frameId: number | null = null;
     let offset = 0;
-    let velocity = targetSpeedRef.current;
     let listWidth = firstList.getBoundingClientRect().width;
     let previousTime = performance.now();
+    let currentSpeed = MARQUEE_SPEED;
+    let targetSpeed = MARQUEE_SPEED;
 
     const measure = () => {
       listWidth = firstList.getBoundingClientRect().width;
@@ -143,12 +124,9 @@ export function BrandStrip() {
       const delta = Math.min((time - previousTime) / 1000, 0.064);
       previousTime = time;
 
-      const target = targetSpeedRef.current;
-      const easing = target === 0 ? 5.2 : 2.8;
-      velocity += (target - velocity) * (1 - Math.exp(-easing * delta));
-      if (target === 0 && velocity < 0.08) velocity = 0;
-
-      offset -= velocity * delta;
+      const easing = 1 - Math.exp(-SPEED_EASING * delta);
+      currentSpeed += (targetSpeed - currentSpeed) * easing;
+      offset -= currentSpeed * delta;
       if (listWidth > 0 && offset <= -listWidth) offset += listWidth;
       track.style.transform = `translate3d(${offset}px, 0, 0)`;
 
@@ -163,16 +141,22 @@ export function BrandStrip() {
     };
     const resumeAnimation = () => {
       previousTime = performance.now();
-      targetSpeedRef.current = 42;
-      ignoreHoverRef.current = true;
       if (frameId === null) frameId = requestAnimationFrame(animate);
     };
     const handleVisibilityChange = () => {
       if (document.hidden) suspendAnimation();
       else resumeAnimation();
     };
+    const slowDown = () => {
+      targetSpeed = MARQUEE_HOVER_SPEED;
+    };
+    const speedUp = () => {
+      targetSpeed = MARQUEE_SPEED;
+    };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    viewport.addEventListener("mouseenter", slowDown);
+    viewport.addEventListener("mouseleave", speedUp);
     window.addEventListener("blur", suspendAnimation);
     window.addEventListener("focus", resumeAnimation);
     window.addEventListener("pagehide", suspendAnimation);
@@ -182,6 +166,8 @@ export function BrandStrip() {
       suspendAnimation();
       resizeObserver.disconnect();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      viewport.removeEventListener("mouseenter", slowDown);
+      viewport.removeEventListener("mouseleave", speedUp);
       window.removeEventListener("blur", suspendAnimation);
       window.removeEventListener("focus", resumeAnimation);
       window.removeEventListener("pagehide", suspendAnimation);
@@ -189,34 +175,22 @@ export function BrandStrip() {
     };
   }, []);
 
-  const slowToStop = () => {
-    if (ignoreHoverRef.current) return;
-    targetSpeedRef.current = 0;
-  };
-  const accelerate = () => {
-    ignoreHoverRef.current = false;
-    targetSpeedRef.current = 42;
-  };
-  const restoreHover = () => {
-    if (!ignoreHoverRef.current) return;
-    ignoreHoverRef.current = false;
-    targetSpeedRef.current = 0;
-  };
+  if (brands.length === 0) return null;
 
   return (
     <section className="brand-strip rails border-b guide-border bg-white">
-      <div className="brand-strip-layout relative flex min-h-32 md:min-h-36">
+      <div className="brand-strip-layout relative flex min-h-20 md:min-h-24">
         <span className="brand-strip-mark brand-strip-mark-tl" aria-hidden="true" />
         <span className="brand-strip-mark brand-strip-mark-bl" aria-hidden="true" />
         <span className="brand-strip-mark brand-strip-mark-br" aria-hidden="true" />
 
         <div className="relative z-10 hidden w-[250px] shrink-0 items-center border-r guide-border bg-white px-7 lg:flex xl:w-[280px] xl:px-8">
-          <p className="font-mono text-[15px] font-medium uppercase leading-[1.55] tracking-[0.055em] text-foreground">
-            Оборудование только
+          <p className="font-mono text-[15px] font-medium leading-[1.55] text-foreground">
+            Работаем с 2012 года
             <br />
-            от проверенных
+            только с проверенным
             <br />
-            производителей
+            оборудованием
           </p>
         </div>
 
@@ -225,16 +199,10 @@ export function BrandStrip() {
           className="manufacturer-marquee relative min-w-0 flex-1 overflow-hidden"
           role="region"
           aria-label="Производители медицинского оборудования"
-          tabIndex={0}
-          onMouseEnter={slowToStop}
-          onMouseLeave={accelerate}
-          onMouseMove={restoreHover}
-          onFocus={slowToStop}
-          onBlur={accelerate}
         >
           <div ref={trackRef} className="flex h-full w-max will-change-transform">
-            <ManufacturerList listRef={firstListRef} />
-            <ManufacturerList hidden />
+            <ManufacturerList manufacturers={brands} listRef={firstListRef} />
+            <ManufacturerList manufacturers={brands} hidden />
           </div>
         </div>
       </div>

@@ -29,7 +29,7 @@ export default async function PersonalDataPolicyPage() {
       fallbackTitle="Политика обработки персональных данных"
       breadcrumbs={[
         { href: "/", label: "Главная" },
-        { label: "Политика обработки ПДн" },
+        { label: "Политика обработки персональных данных" },
       ]}
     >
       <p>

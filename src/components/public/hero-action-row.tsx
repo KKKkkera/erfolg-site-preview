@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
-import { QuoteRequestDialog } from "@/components/public/quote-request-dialog";
+import { LeadDialog } from "@/components/public/lead-dialog";
 
 /**
  * Строка-оглавление «инженерного паспорта»: крупный индекс → название →
@@ -11,7 +11,7 @@ import { QuoteRequestDialog } from "@/components/public/quote-request-dialog";
  * сетку «трёх равных колонок».
  *
  * Компонент клиентский намеренно. Раньше он жил в серверном page.tsx и для
- * варианта `dialog` отдавал <QuoteRequestDialog><button>…</button></…>.
+ * варианта `dialog` отдавал <LeadDialog><button>…</button></…>.
  * Триггер уезжал в клиентский компонент как children через RSC-границу, и
  * Radix Slot на сервере не признавал его валидным React-элементом: строка
  * «Запрос КП» полностью отсутствовала в серверном HTML и появлялась только
@@ -51,8 +51,9 @@ export function HeroActionRow({
       <span className="text-sm leading-6 text-muted-foreground">{text}</span>
       <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary md:mt-0 md:justify-self-end">
         {kind === "dialog" ? "Получить КП" : "Перейти"}
-        <ArrowRight
+        <ChevronRight
           className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+          strokeWidth={2.5}
           aria-hidden="true"
         />
       </span>
@@ -61,11 +62,11 @@ export function HeroActionRow({
 
   if (kind === "dialog") {
     return (
-      <QuoteRequestDialog source="hero-action">
+      <LeadDialog source="hero-action">
         <button type="button" className={ROW_CLASS}>
           {content}
         </button>
-      </QuoteRequestDialog>
+      </LeadDialog>
     );
   }
 

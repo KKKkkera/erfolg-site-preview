@@ -133,7 +133,7 @@ export default async function AboutPage() {
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
             Поставочное и сервисное направления подтверждены лицензией
-            регулятора и реестрами Росздравнадзора.
+            регулятора и реестрами Росздравнадзора
           </p>
 
           <div className="mt-7 grid gap-5 md:grid-cols-2">

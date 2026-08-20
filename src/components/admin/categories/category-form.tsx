@@ -28,8 +28,6 @@ export type CategoryFormInitial = {
   slug?: string;
   description?: string | null;
   parentId?: string | null;
-  seoTitle?: string | null;
-  seoDesc?: string | null;
   sort?: number;
 };
 
@@ -66,8 +64,6 @@ export function CategoryForm({
       slug: String(fd.get("slug") ?? ""),
       description: String(fd.get("description") ?? ""),
       parentId: String(fd.get("parentId") ?? ""),
-      seoTitle: String(fd.get("seoTitle") ?? ""),
-      seoDesc: String(fd.get("seoDesc") ?? ""),
       sort: Number(fd.get("sort") ?? 0),
     };
     startTransition(async () => {
@@ -161,35 +157,6 @@ export function CategoryForm({
               name="sort"
               type="number"
               defaultValue={initial?.sort ?? 0}
-              disabled={pending}
-            />
-          </Field>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">SEO</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Field label="Title (SEO)" name="seoTitle" error={errors.seoTitle}>
-            <Input
-              id="seoTitle"
-              name="seoTitle"
-              defaultValue={initial?.seoTitle ?? ""}
-              disabled={pending}
-            />
-          </Field>
-          <Field
-            label="Description (SEO)"
-            name="seoDesc"
-            error={errors.seoDesc}
-          >
-            <Textarea
-              id="seoDesc"
-              name="seoDesc"
-              rows={2}
-              defaultValue={initial?.seoDesc ?? ""}
               disabled={pending}
             />
           </Field>

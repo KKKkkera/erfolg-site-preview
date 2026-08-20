@@ -42,10 +42,17 @@ export type ProductFormInitial = {
   fullDesc?: string | null;
   regNumber?: string | null;
   regDate?: string | null;
+  regValidUntil?: string | null;
+  regAuthority?: string | null;
   regUrl?: string | null;
+  markingRequired?: boolean | null;
+  markingCodes?: string | null;
   seoTitle?: string | null;
   seoDesc?: string | null;
   sort?: number;
+  showOnHome?: boolean;
+  homeSort?: number;
+  homeBadge?: string | null;
   images?: ProductImageItem[];
 };
 
@@ -69,6 +76,9 @@ export function ProductForm({
   const [slug, setSlug] = useState(initial?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(initial?.slug));
   const [fullDesc, setFullDesc] = useState(initial?.fullDesc ?? "");
+  const [showOnHome, setShowOnHome] = useState(
+    initial?.showOnHome ?? false,
+  );
 
   function onNameChange(value: string) {
     setName(value);
@@ -101,10 +111,20 @@ export function ProductForm({
       fullDesc,
       regNumber: String(fd.get("regNumber") ?? ""),
       regDate: String(fd.get("regDate") ?? ""),
+      regValidUntil: String(fd.get("regValidUntil") ?? ""),
+      regAuthority: String(fd.get("regAuthority") ?? ""),
       regUrl: String(fd.get("regUrl") ?? ""),
+      markingRequired: String(fd.get("markingRequired") ?? "") as
+        | ""
+        | "yes"
+        | "no",
+      markingCodes: String(fd.get("markingCodes") ?? ""),
       seoTitle: String(fd.get("seoTitle") ?? ""),
       seoDesc: String(fd.get("seoDesc") ?? ""),
       sort: Number(fd.get("sort") ?? 0),
+      showOnHome: fd.get("showOnHome") === "on",
+      homeSort: Number(fd.get("homeSort") ?? 0),
+      homeBadge: String(fd.get("homeBadge") ?? ""),
     };
 
     startTransition(async () => {
@@ -323,6 +343,37 @@ export function ProductForm({
                   />
                 </Field>
               </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field
+                  label="Срок действия"
+                  name="regValidUntil"
+                  error={errors.regValidUntil}
+                >
+                  <Input
+                    id="regValidUntil"
+                    name="regValidUntil"
+                    type="date"
+                    defaultValue={initial?.regValidUntil ?? ""}
+                    disabled={pending}
+                  />
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    Пусто — бессрочное: так РУ выдают с 2013 года.
+                  </p>
+                </Field>
+                <Field
+                  label="Орган, выдавший документ"
+                  name="regAuthority"
+                  error={errors.regAuthority}
+                >
+                  <Input
+                    id="regAuthority"
+                    name="regAuthority"
+                    defaultValue={initial?.regAuthority ?? ""}
+                    disabled={pending}
+                    placeholder="Росздравнадзор"
+                  />
+                </Field>
+              </div>
               <Field
                 label="Ссылка на запись в реестре"
                 name="regUrl"
@@ -335,6 +386,54 @@ export function ProductForm({
                   defaultValue={initial?.regUrl ?? ""}
                   disabled={pending}
                   placeholder="https://roszdravnadzor.gov.ru/..."
+                />
+              </Field>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Маркировка</CardTitle>
+              <CardDescription>
+                «Честный знак». Пока не выбрано — в карточке товара блок
+                маркировки не показывается.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Field
+                label="Товар подлежит маркировке"
+                name="markingRequired"
+                error={errors.markingRequired}
+              >
+                <select
+                  id="markingRequired"
+                  name="markingRequired"
+                  defaultValue={
+                    initial?.markingRequired === true
+                      ? "yes"
+                      : initial?.markingRequired === false
+                        ? "no"
+                        : ""
+                  }
+                  disabled={pending}
+                  className="h-10 w-full rounded-md border border-input bg-white px-3 text-sm"
+                >
+                  <option value="">Не указано</option>
+                  <option value="yes">Да, подлежит</option>
+                  <option value="no">Нет, не подлежит</option>
+                </select>
+              </Field>
+              <Field
+                label="Сведения о кодах"
+                name="markingCodes"
+                error={errors.markingCodes}
+              >
+                <Input
+                  id="markingCodes"
+                  name="markingCodes"
+                  defaultValue={initial?.markingCodes ?? ""}
+                  disabled={pending}
+                  placeholder="Коды передаются при отгрузке"
                 />
               </Field>
             </CardContent>
@@ -373,17 +472,76 @@ export function ProductForm({
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Сортировка</CardTitle>
+              <CardTitle className="text-base">Главная и сортировка</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-5">
+              <div className="flex items-start gap-3">
+                <input
+                  id="showOnHome"
+                  name="showOnHome"
+                  type="checkbox"
+                  checked={showOnHome}
+                  onChange={(event) => setShowOnHome(event.target.checked)}
+                  disabled={pending}
+                  className="mt-0.5 h-4 w-4 rounded border-input accent-primary"
+                />
+                <div className="space-y-1">
+                  <Label htmlFor="showOnHome">Показывать на главной</Label>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    Товар попадёт в сетку «Новинки и спецпредложения», если он опубликован.
+                  </p>
+                </div>
+              </div>
+              {showOnHome ? (
+                <Field
+                  label="Плашка на главной"
+                  name="homeBadge"
+                  error={errors.homeBadge}
+                >
+                  <Input
+                    id="homeBadge"
+                    name="homeBadge"
+                    maxLength={40}
+                    placeholder="Новинка, −20%, Спецпредложение"
+                    defaultValue={initial?.homeBadge ?? ""}
+                    disabled={pending}
+                  />
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    До 40 символов. Оставьте пустым, чтобы скрыть плашку.
+                  </p>
+                </Field>
+              ) : null}
+              <Field
+                label="Порядок на главной"
+                name="homeSort"
+                error={errors.homeSort}
+              >
+                <Input
+                  id="homeSort"
+                  name="homeSort"
+                  type="number"
+                  min={0}
+                  max={100000}
+                  defaultValue={initial?.homeSort ?? 0}
+                  disabled={pending}
+                />
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Меньшее число — выше. Первый товар занимает большую плитку; на главной показываются первые пять.
+                </p>
+              </Field>
               <Field label="Sort (число)" name="sort" error={errors.sort}>
                 <Input
                   id="sort"
                   name="sort"
                   type="number"
+                  min={0}
+                  max={100000}
                   defaultValue={initial?.sort ?? 0}
                   disabled={pending}
                 />
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Общий порядок в каталоге.
+                </p>
               </Field>
             </CardContent>
           </Card>

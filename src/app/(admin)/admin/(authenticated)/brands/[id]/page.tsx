@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { BrandForm } from "@/components/admin/brands/brand-form";
 import { db } from "@/lib/db";
+import { isS3Configured } from "@/lib/s3";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,10 @@ export default async function EditBrandPage(
           slug: brand.slug,
           country: brand.country,
           website: brand.website,
+          logo: brand.logo,
+          sort: brand.sort,
         }}
+        s3Configured={isS3Configured()}
       />
     </div>
   );

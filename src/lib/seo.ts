@@ -99,27 +99,6 @@ export function defaultMetadata(input: DefaultMetadataInput): Metadata {
   };
 }
 
-type CategoryLike = {
-  slug: string;
-  name: string;
-  description?: string | null;
-  seoTitle?: string | null;
-  seoDesc?: string | null;
-};
-
-export function categoryMetadata(category: CategoryLike): Metadata {
-  // Цель — ≤60 символов с учётом " | Erfolg" из template (root layout уже добавляет суффикс).
-  const fallbackTitle = `${category.name} — каталог`;
-  const fallbackDesc =
-    category.description ??
-    `${category.name}: подбор по ТЗ, регистрационное удостоверение Росздравнадзора на каждое изделие, доставка по России. Сервис по лицензии ТОМИ. Цена по запросу.`;
-  return defaultMetadata({
-    title: category.seoTitle ?? fallbackTitle,
-    description: category.seoDesc ?? fallbackDesc,
-    path: `/catalog/${category.slug}`,
-  });
-}
-
 type ProductLike = {
   slug: string;
   name: string;
@@ -143,9 +122,7 @@ export function productMetadata(product: ProductLike): Metadata {
   const fallbackDesc =
     product.shortDesc ??
     `${product.name}${product.brand?.name ? ` (${product.brand.name})` : ""} — поставка по России.${regClause} Цена по запросу, КП в течение рабочего дня.`;
-  const path = product.category?.slug
-    ? `/catalog/${product.category.slug}/${product.slug}`
-    : `/catalog/${product.slug}`;
+  const path = `/catalog/${product.slug}`;
   const firstImage = product.images?.[0]?.url;
   // SVG в og:image не понимают Telegram/WhatsApp/VK — для схематичных
   // иллюстраций каталога отдаём дефолтную OG-картинку.

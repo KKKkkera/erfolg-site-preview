@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 import { RegBadge } from "@/components/public/reg-badge";
 import { hasRealRegNumber } from "@/lib/reg-number";
@@ -30,29 +30,22 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const imageAlt =
     image?.alt ||
     `${product.name}${product.model ? ` — ${product.model}` : ""}`;
-  const detailHref = product.category
-    ? `/catalog/${product.category.slug}/${product.slug}`
-    : `/catalog/${product.slug}`;
+  const detailHref = `/catalog/${product.slug}`;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-white transition-colors hover:border-primary/60 focus-within:ring-2 focus-within:ring-inset focus-within:ring-ring">
-      <div className="relative aspect-square overflow-hidden border-b border-border bg-white">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-border bg-white transition-colors duration-200 hover:border-primary active:border-primary-dark has-[a:focus-visible]:outline has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ring">
+      <div className="relative aspect-square overflow-hidden border-b border-border/40 bg-white">
         <Image
           src={imageUrl}
           alt={imageAlt}
           fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-          className="object-contain p-5"
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 45vw"
+          className="object-contain p-4 sm:p-5"
           unoptimized={imageUrl.endsWith(".svg")}
         />
-        {product.isUsed ? (
-          <span className="absolute left-3 top-3 rounded-sm bg-warning px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-warning-foreground">
-            Б/У
-          </span>
-        ) : null}
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex flex-1 flex-col gap-2.5 p-3 sm:gap-3 sm:p-4">
         {product.brand?.name || product.model ? (
           <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {product.brand?.name ? <span>{product.brand.name}</span> : null}
@@ -64,7 +57,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
         ) : null}
 
-        <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-tight text-foreground">
+        <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug tracking-tight text-foreground sm:text-[15px]">
           <Link
             href={detailHref}
             className="transition-colors after:absolute after:inset-0 after:z-[1] after:content-[''] hover:text-primary focus-visible:outline-none"
@@ -79,10 +72,17 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between border-t border-border pt-3">
-          <span className="text-sm font-medium text-primary">Подробнее</span>
-          <ArrowRight
-            className="h-4 w-4 text-muted-foreground/60 transition-all group-hover:translate-x-0.5 group-hover:text-primary"
+        {/* -mx-4 px-4: линия идёт от края до края карточки, а не обрывается
+            в поле отступа. Тон еле заметный — это разделитель, не рамка. */}
+        <div className="-mx-3 mt-auto flex items-center justify-between border-t border-border/40 px-3 pt-2.5 sm:-mx-4 sm:px-4">
+          {/* Ссылка не в акцентном цвете: в сетке из дюжины карточек она
+              перетягивала внимание с названий товаров. */}
+          <span className="text-[12px] font-medium text-muted-foreground transition-colors group-hover:text-primary sm:text-[13px]">
+            Подробнее
+          </span>
+          <ChevronRight
+            className="h-3.5 w-3.5 text-muted-foreground/50 transition-all group-hover:translate-x-0.5 group-hover:text-primary"
+            strokeWidth={2.5}
             aria-hidden="true"
           />
         </div>

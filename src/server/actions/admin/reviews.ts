@@ -7,58 +7,105 @@ import { db } from "@/lib/db";
 import { logAction } from "@/lib/audit";
 import { requireAdmin } from "@/server/actions/admin/auth";
 
-const StatusSchema = z.enum(["PENDING", "PUBLISHED", "REJECTED"]);
-
-export type ReviewActionResult = { ok: true } | { ok: false; message: string };
-
 /**
- * Модерация отзыва. Публикация проставляет publishedAt — по нему строится
- * сортировка на сайте; снятие с публикации дату не стирает, чтобы при
- * повторной публикации отзыв не прыгал в начало списка.
+ * Отзывы ведёт администратор: с сайта их оставить нельзя, поэтому здесь
+ * обычный CRUD без модерации. Согласие автора на публикацию собирается
+ * вне сайта — в карточке хранится только то, что показывается публично.
  */
-export async function updateReviewStatus(
-  id: string,
-  status: z.infer<typeof StatusSchema>,
-  moderatorNote?: string,
-): Promise<ReviewActionResult> {
+const ReviewInput = z.object({
+  id: z.string().optional().nullable(),
+  authorName: z.string().trim().min(2, "Укажите, как подписать отзыв").max(120),
+  position: z.string().trim().max(160).optional().or(z.literal("")),
+  organization: z.string().trim().max(200).optional().or(z.literal("")),
+  city: z.string().trim().max(120).optional().or(z.literal("")),
+  text: z.string().trim().min(20, "Текст слишком короткий").max(4000),
+  rating: z.coerce.number().int().min(1).max(5).optional().nullable(),
+  imageUrl: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine(
+      (value) => value === "" || /^(?:\/(?:images|media|uploads)\/|https:\/\/)/.test(value),
+      "Некорректный адрес скана",
+    )
+    .optional()
+    .or(z.literal("")),
+  isPublished: z.boolean(),
+  sort: z.coerce.number().int().min(0).max(100000),
+  publishedAt: z.string().trim().optional().or(z.literal("")),
+});
+
+export type ReviewSaveResult =
+  | { ok: true; id: string }
+  | { ok: false; errors?: Record<string, string>; message?: string };
+
+export async function saveReview(
+  input: z.input<typeof ReviewInput>,
+): Promise<ReviewSaveResult> {
   const admin = await requireAdmin().catch(() => null);
   if (!admin) return { ok: false, message: "Unauthorized" };
 
-  const s = StatusSchema.safeParse(status);
-  if (!s.success) return { ok: false, message: "Неверный статус" };
+  const parsed = ReviewInput.safeParse(input);
+  if (!parsed.success) {
+    const errors: Record<string, string> = {};
+    for (const issue of parsed.error.issues) {
+      errors[issue.path.join(".")] = issue.message;
+    }
+    return { ok: false, errors, message: "Проверьте поля формы" };
+  }
+
+  const data = parsed.data;
+  const date = data.publishedAt ? new Date(data.publishedAt) : null;
+  if (date && Number.isNaN(date.getTime())) {
+    return {
+      ok: false,
+      errors: { publishedAt: "Некорректная дата" },
+      message: "Проверьте поля формы",
+    };
+  }
+
+  const payload = {
+    authorName: data.authorName,
+    position: data.position?.trim() ? data.position.trim() : null,
+    organization: data.organization?.trim() ? data.organization.trim() : null,
+    city: data.city?.trim() ? data.city.trim() : null,
+    text: data.text,
+    rating: data.rating ?? null,
+    imageUrl: data.imageUrl?.trim() ? data.imageUrl.trim() : null,
+    isPublished: data.isPublished,
+    sort: data.sort,
+    publishedAt: date,
+  };
 
   try {
-    const current = await db.review.findUnique({
-      where: { id },
-      select: { publishedAt: true },
-    });
-    if (!current) return { ok: false, message: "Отзыв не найден" };
+    let id: string;
+    if (data.id) {
+      const updated = await db.review.update({
+        where: { id: data.id },
+        data: payload,
+      });
+      id = updated.id;
+      await logAction(admin.id, "update", "Review", id);
+    } else {
+      const created = await db.review.create({ data: payload });
+      id = created.id;
+      await logAction(admin.id, "create", "Review", id);
+    }
 
-    await db.review.update({
-      where: { id },
-      data: {
-        status: s.data,
-        moderatorNote: moderatorNote?.trim() || undefined,
-        publishedAt:
-          s.data === "PUBLISHED" && !current.publishedAt
-            ? new Date()
-            : current.publishedAt,
-      },
-    });
-
-    await logAction(admin.id, "status", "Review", id, { status: s.data });
     revalidatePath("/admin/reviews");
     revalidatePath(`/admin/reviews/${id}`);
     revalidatePath("/reviews");
     revalidatePath("/");
-    return { ok: true };
+    return { ok: true, id };
   } catch (e) {
-    console.error("updateReviewStatus error", e);
-    return { ok: false, message: "Не удалось сохранить статус" };
+    console.error("saveReview error", e);
+    return { ok: false, message: "Не удалось сохранить отзыв" };
   }
 }
 
-export async function deleteReview(id: string): Promise<ReviewActionResult> {
+export async function deleteReview(
+  id: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
   const admin = await requireAdmin().catch(() => null);
   if (!admin) return { ok: false, message: "Unauthorized" };
 
@@ -67,6 +114,7 @@ export async function deleteReview(id: string): Promise<ReviewActionResult> {
     await logAction(admin.id, "delete", "Review", id, null);
     revalidatePath("/admin/reviews");
     revalidatePath("/reviews");
+    revalidatePath("/");
     return { ok: true };
   } catch (e) {
     console.error("deleteReview error", e);

@@ -4,81 +4,94 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HOME_FAQ } from "@/components/public/home-faq-data";
-import { SectionTag } from "@/components/public/decor";
+
+/* Восемь вопросов раскладываем на две колонки по четыре: порядок идёт
+   сверху вниз внутри колонки, поэтому режем список пополам, а не через один. */
+const HALF = Math.ceil(HOME_FAQ.length / 2);
+const FAQ_COLUMNS = [HOME_FAQ.slice(0, HALF), HOME_FAQ.slice(HALF)];
 
 export function HomeFaq() {
-  const [open, setOpen] = useState<number | null>(0);
+  /* Каждый вопрос раскрывается сам по себе: открытых может быть сколько
+     угодно, соседние карточки при этом не тянутся. */
+  const [open, setOpen] = useState<Set<number>>(() => new Set());
+
+  const toggle = (idx: number) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
 
   return (
     <section className="rails border-b guide-border bg-surface/60">
       <div className="marks container py-14 md:py-16">
-        <div className="reveal grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
-          <div className="lg:pt-1">
-            <SectionTag index="09">Частые вопросы</SectionTag>
-            <h2 className="mt-5 text-balance text-2xl font-semibold leading-snug tracking-tight text-foreground md:text-[1.9rem]">
-              Что важно знать перед запросом КП
-            </h2>
-            <p className="mt-4 max-w-[28rem] text-base leading-7 text-muted-foreground">
-              Самые частые вопросы клиник и закупочных служб. Если не нашли свой —
-              напишите нам, ответим в рабочий день.
-            </p>
-          </div>
+        <h2 className="reveal text-center text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[1.8rem] md:text-[2.1rem]">
+          Часто задаваемые вопросы
+        </h2>
 
-          <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-white">
-            {HOME_FAQ.map((item, idx) => {
-              const isOpen = open === idx;
-              return (
-                <li key={item.q}>
-                  <button
-                    type="button"
-                    id={`faq-q-${idx}`}
-                    onClick={() => setOpen(isOpen ? null : idx)}
-                    aria-expanded={isOpen}
-                    // aria-controls связывает кнопку с её панелью: без него скринридер
-                    // объявляет «свёрнуто», но не может сказать, что именно свёрнуто.
-                    aria-controls={`faq-a-${idx}`}
-                    className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-surface/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring md:px-6 md:py-5"
+        <div className="reveal mt-8 grid gap-2 lg:grid-cols-2 lg:gap-x-4">
+          {FAQ_COLUMNS.map((column, columnIndex) => (
+            <ul key={columnIndex} className="flex flex-col gap-2">
+              {column.map((item, itemIndex) => {
+                /* Сквозной индекс: состояние одно на обе колонки, поэтому
+                   и ключи для aria-атрибутов должны быть уникальны. */
+                const idx = columnIndex * HALF + itemIndex;
+                const isOpen = open.has(idx);
+                return (
+                  <li
+                    key={item.q}
+                    className="overflow-hidden rounded-lg border border-border bg-white"
                   >
-                    <span
-                      aria-hidden="true"
-                      className="w-6 shrink-0 font-mono text-[11px] font-medium text-flame-ink"
+                    <button
+                      type="button"
+                      id={`faq-q-${idx}`}
+                      onClick={() => toggle(idx)}
+                      aria-expanded={isOpen}
+                      // aria-controls связывает кнопку с её панелью: без него скринридер
+                      // объявляет «свёрнуто», но не может сказать, что именно свёрнуто.
+                      aria-controls={`faq-a-${idx}`}
+                      className="flex h-14 w-full items-center gap-4 px-4 text-left transition-colors hover:bg-surface/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring md:h-[3.75rem] md:px-5"
                     >
-                      {String(idx + 1).padStart(2, "0")}
-                    </span>
-                    <span className="flex-1 text-[15px] font-medium leading-snug text-foreground md:text-base">
-                      {item.q}
-                    </span>
-                    <Plus
+                      <span className="line-clamp-2 flex-1 text-sm font-medium leading-tight text-foreground md:text-sm">
+                        {item.q}
+                      </span>
+                      <Plus
+                        className={cn(
+                          "h-4 w-4 shrink-0 text-flame-ink transition-transform duration-200",
+                          isOpen ? "rotate-45" : "rotate-0",
+                        )}
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <div
+                      id={`faq-a-${idx}`}
+                      role="region"
+                      aria-labelledby={`faq-q-${idx}`}
+                      // Свёрнутая панель имеет нулевую высоту, но текст остаётся в DOM:
+                      // без aria-hidden скринридер читал все восемь ответов подряд,
+                      // а Ctrl+F находил «скрытое». Анимацию это не ломает.
+                      aria-hidden={!isOpen}
                       className={cn(
-                        "h-4 w-4 shrink-0 text-flame-ink transition-transform duration-200",
-                        isOpen ? "rotate-45" : "rotate-0",
+                        "grid overflow-hidden transition-[grid-template-rows,padding] duration-200 ease-out",
+                        isOpen ? "grid-rows-[1fr] pb-4" : "grid-rows-[0fr] pb-0",
                       )}
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <div
-                    id={`faq-a-${idx}`}
-                    role="region"
-                    aria-labelledby={`faq-q-${idx}`}
-                    // Свёрнутая панель имеет нулевую высоту, но текст остаётся в DOM:
-                    // без aria-hidden скринридер читал все восемь ответов подряд,
-                    // а Ctrl+F находил «скрытое». Анимацию это не ломает.
-                    aria-hidden={!isOpen}
-                    className={cn(
-                      "grid overflow-hidden transition-[grid-template-rows,padding] duration-200 ease-out",
-                      isOpen ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr] pb-0",
-                    )}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="pl-[3.75rem] pr-6 text-sm leading-7 text-muted-foreground md:pl-16">
-                        {item.a}
-                      </p>
+                    >
+                      <div className="overflow-hidden">
+                        {/* Линия отбивает ответ от вопроса. Отступы по краям
+                            те же, что у текста, — не во всю карточку. */}
+                        <div className="mx-4 border-t border-border/50 pt-3.5 md:mx-5">
+                          <p className="text-[13px] leading-6 text-muted-foreground md:text-sm md:leading-7">
+                            {item.a}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          ))}
         </div>
       </div>
     </section>

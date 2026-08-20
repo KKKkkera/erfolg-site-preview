@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { BrandForm } from "@/components/admin/brands/brand-form";
+import { isS3Configured } from "@/lib/s3";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ export default function NewBrandPage() {
           Новый бренд
         </h1>
       </div>
-      <BrandForm mode="create" />
+      <BrandForm mode="create" s3Configured={isS3Configured()} />
     </div>
   );
 }

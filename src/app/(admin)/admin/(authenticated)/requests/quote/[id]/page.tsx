@@ -102,7 +102,7 @@ export default async function QuoteRequestPage(
               value={
                 product ? (
                   <Link
-                    href={`/catalog/${product.categorySlug}/${product.slug}`}
+                    href={`/catalog/${product.slug}`}
                     className="text-primary hover:underline"
                     target="_blank"
                   >

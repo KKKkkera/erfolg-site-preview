@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -15,55 +16,30 @@ export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Отзывы — Эрфольг" };
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "На модерации",
-  PUBLISHED: "Опубликован",
-  REJECTED: "Отклонён",
-};
-
-const STATUS_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
-  PENDING: "default",
-  PUBLISHED: "secondary",
-  REJECTED: "outline",
-};
-
-const FILTERS = [
-  { value: "", label: "Все" },
-  { value: "PENDING", label: "На модерации" },
-  { value: "PUBLISHED", label: "Опубликованные" },
-  { value: "REJECTED", label: "Отклонённые" },
-];
-
-export default async function AdminReviewsPage(props: {
-  searchParams?: Promise<{ status?: string }>;
-}) {
-  const searchParams = await props.searchParams;
-  const status = (searchParams?.status ?? "").trim();
-
+export default async function AdminReviewsPage() {
   let rows: Array<{
     id: string;
     authorName: string;
     organization: string | null;
     city: string | null;
-    status: string;
-    createdAt: Date;
+    isPublished: boolean;
+    sort: number;
+    publishedAt: Date | null;
   }> = [];
   let dbError = false;
 
   try {
     rows = await db.review.findMany({
-      where: status
-        ? { status: status as "PENDING" | "PUBLISHED" | "REJECTED" }
-        : undefined,
-      orderBy: { createdAt: "desc" },
-      take: 100,
+      orderBy: [{ sort: "asc" }, { publishedAt: "desc" }, { createdAt: "desc" }],
+      take: 200,
       select: {
         id: true,
         authorName: true,
         organization: true,
         city: true,
-        status: true,
-        createdAt: true,
+        isPublished: true,
+        sort: true,
+        publishedAt: true,
       },
     });
   } catch (e) {
@@ -73,29 +49,17 @@ export default async function AdminReviewsPage(props: {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Отзывы</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Отзыв попадает на сайт только после публикации здесь. Опубликованный
-          отзыв можно снять в любой момент — например, если автор отозвал
-          согласие.
-        </p>
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <Link
-            key={f.value || "all"}
-            href={f.value ? `/admin/reviews?status=${f.value}` : "/admin/reviews"}
-            className={
-              status === f.value
-                ? "rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground"
-                : "rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            }
-          >
-            {f.label}
-          </Link>
-        ))}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Отзывы</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Отзывы заводятся здесь: с сайта их оставить нельзя. Порядок задаётся
+            полем «Порядок» — меньше значение, выше карточка.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/admin/reviews/new">Добавить отзыв</Link>
+        </Button>
       </div>
 
       {dbError ? (
@@ -103,7 +67,9 @@ export default async function AdminReviewsPage(props: {
           База данных недоступна — список не загружен.
         </p>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Отзывов пока нет.</p>
+        <p className="text-sm text-muted-foreground">
+          Отзывов пока нет — нажмите «Добавить отзыв».
+        </p>
       ) : (
         <div className="overflow-hidden rounded-lg border border-border">
           <Table>
@@ -113,7 +79,8 @@ export default async function AdminReviewsPage(props: {
                 <TableHead>Организация</TableHead>
                 <TableHead>Город</TableHead>
                 <TableHead>Статус</TableHead>
-                <TableHead>Получен</TableHead>
+                <TableHead>Дата</TableHead>
+                <TableHead>Порядок</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -134,15 +101,19 @@ export default async function AdminReviewsPage(props: {
                     {r.city || "—"}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={STATUS_VARIANT[r.status] ?? "outline"}>
-                      {STATUS_LABEL[r.status] ?? r.status}
+                    <Badge variant={r.isPublished ? "secondary" : "outline"}>
+                      {r.isPublished ? "На сайте" : "Скрыт"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {new Intl.DateTimeFormat("ru-RU", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    }).format(r.createdAt)}
+                    {r.publishedAt
+                      ? new Intl.DateTimeFormat("ru-RU", {
+                          dateStyle: "short",
+                        }).format(r.publishedAt)
+                      : "—"}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {r.sort}
                   </TableCell>
                 </TableRow>
               ))}

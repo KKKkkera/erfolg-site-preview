@@ -64,13 +64,11 @@ type ProductSeed = {
 };
 
 /**
- * Иллюстрации лежат в public/images/catalog/<slug>.svg и генерируются
- * скриптом scripts/generate-catalog-illustrations.mjs. Это схемы по типу
- * прибора, а не снимки изделий — что и сказано в alt, чтобы посетитель
- * (и читалка экрана) не принял их за фотографию поставляемой модели.
+ * Изображения оборудования лежат в public/images/catalog/<slug>.png.
+ * Имя файла совпадает со slug товара, поэтому связь сохраняется при повторном seed.
  */
-const imageUrlFor = (slug: string) => `/images/catalog/${slug}.svg`;
-const imageAltFor = (name: string) => `${name} — схематичное изображение`;
+const imageUrlFor = (slug: string) => `/images/catalog/${slug}.png`;
+const imageAltFor = (name: string) => `${name} — изображение оборудования`;
 
 const SPEC_NOTE =
   "<p>Точная комплектация, версия программного обеспечения и состав принадлежностей согласуются в коммерческом предложении под задачу отделения и требования закупочной документации.</p>";

@@ -53,6 +53,7 @@ model Brand {
   logo      String?
   country   String?
   website   String?
+  sort      Int       @default(0)
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -80,12 +81,24 @@ model Product {
   // Регулятор медизделий (Росздравнадзор)
   regNumber      String?
   regDate        DateTime?
+  // Срок действия РУ: пусто — бессрочное, так выдают с 2013 года
+  regValidUntil  DateTime?
+  // Орган, выдавший документ. Обычно Росздравнадзор, но у части позиций —
+  // территориальный орган или зарубежный регулятор, поэтому поле текстовое.
+  regAuthority   String?
   regUrl         String?
+  // Маркировка «Честный знак»: null — не указано, чтобы «нет» не проставлялось
+  // молча всем старым карточкам
+  markingRequired Boolean?
+  markingCodes    String?
   // SEO
   seoTitle       String?
   seoDesc        String?
   // Order
   sort           Int            @default(0)
+  showOnHome     Boolean        @default(false)
+  homeSort       Int            @default(0)
+  homeBadge      String?
   // Связи
   images         ProductImage[]
   specs          ProductSpec[]
@@ -98,6 +111,7 @@ model Product {
   @@index([categoryId])
   @@index([brandId])
   @@index([status])
+  @@index([status, showOnHome, homeSort])
   @@index([kind])
   @@map("products")
 }
@@ -155,9 +169,10 @@ model QuoteRequest {
   product      Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   // contact
   name         String
-  // Телефон необязателен: обязательным сделан email — КП уходит письмом.
+  // Единая форма сайта спрашивает только имя, телефон и комментарий:
+  // обязателен телефон, email остался для заявок, созданных до этой правки.
   phone        String?
-  email        String
+  email        String?
   organization String?
   inn          String?
   message      String?       @db.Text
@@ -224,44 +239,52 @@ model ContactRequest {
   @@map("contact_requests")
 }
 
-enum ReviewStatus {
-  PENDING
-  PUBLISHED
-  REJECTED
+/**
+ * Отзыв клиники. Карточки заводит администратор — с сайта отзыв оставить
+ * нельзя, согласие автора собирается вне сайта.
+ */
+model Review {
+  id           String    @id @default(cuid())
+  authorName   String
+  position     String?
+  organization String?
+  city         String?
+  text         String    @db.Text
+  // Скан благодарственного письма. Текст письма дублируется в text —
+  // картинку поисковик не читает, а страница должна индексироваться.
+  imageUrl     String?
+  rating       Int?
+  isPublished  Boolean   @default(true)
+  sort         Int       @default(0)
+  // Дата отзыва — её выставляет админ, к моменту создания записи не привязана.
+  publishedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([isPublished, sort])
+  @@map("reviews")
 }
 
 /**
- * Отзыв клиники. Публикуется только после модерации: брендбук запрещает
- * непроверяемую социальную доказательность, поэтому «сначала опубликовать,
- * потом проверить» здесь не подходит.
- *
- * consent — отметка согласия на публикацию отзыва и персональных данных
- * (текст на /review-consent). Без неё форма не отправляется.
+ * Выполненная работа: поставка, монтаж или сервисный проект. Ведётся
+ * администратором и выводится на /works и в блоке «Наши клиенты».
  */
-model Review {
-  id           String       @id @default(cuid())
-  authorName   String
-  city         String?
+model Work {
+  id           String    @id @default(cuid())
+  title        String
   organization String?
-  // Публиковать ли название организации: согласие на публикацию имени
-  // и согласие на публикацию работодателя — разные вещи.
-  showOrganization Boolean  @default(false)
-  text         String       @db.Text
-  attachments  Json?
-  rating       Int?
-  consent      Boolean
-  status       ReviewStatus @default(PENDING)
-  publishedAt  DateTime?
-  moderatorNote String?     @db.Text
-  contactEmail String?
-  contactPhone String?
-  ip           String?
-  userAgent    String?      @db.Text
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  city         String?
+  category     String?
+  summary      String    @db.Text
+  imageUrl     String?
+  isPublished  Boolean   @default(true)
+  sort         Int       @default(0)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  @@index([status, publishedAt])
-  @@map("reviews")
+  @@index([isPublished, sort])
+  @@map("works")
 }
 
 // ─────────────────────── CMS ───────────────────────
