@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 
@@ -28,9 +31,24 @@ export function BrandLogo({
   imgClassName,
   priority = false,
 }: BrandLogoProps) {
+  const pathname = usePathname();
+
+  /* Клик по логотипу на той же странице, куда он ведёт, навигацию не
+     вызывает — Next видит тот же маршрут и ничего не делает, страница
+     остаётся прокрученной. Поэтому прокручиваем наверх сами. */
+  const isCurrent = pathname === href;
+
   return (
     <Link
       href={href}
+      onClick={
+        isCurrent
+          ? (e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0 });
+            }
+          : undefined
+      }
       className={cn("inline-flex shrink-0 items-center", className)}
       aria-label="Erfolg — на главную"
     >

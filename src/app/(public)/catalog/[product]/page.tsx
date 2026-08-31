@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
+import { ContentBlocks } from "@/components/public/content-blocks";
 import { CornerBrackets } from "@/components/public/decor";
 import { ProductCard } from "@/components/public/product-card";
 import { RegBadge } from "@/components/public/reg-badge";
@@ -29,7 +30,6 @@ import { LeadDialog } from "@/components/public/lead-dialog";
 import { JsonLd } from "@/components/seo/json-ld";
 import { productMetadata } from "@/lib/seo";
 import { breadcrumbListSchema, productSchema } from "@/lib/schema";
-import { sanitizeCmsHtml } from "@/lib/sanitize-cms";
 
 export const revalidate = 300;
 
@@ -339,9 +339,12 @@ export default async function ProductPage(props: ProductPageProps) {
 
             <TabsContent value="description" className="mt-6">
               {product.fullDesc ? (
-                <div
-                  className="prose prose-slate max-w-none text-foreground prose-headings:font-sans prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-primary prose-li:marker:text-flame-ink"
-                  dangerouslySetInnerHTML={{ __html: sanitizeCmsHtml(product.fullDesc) }}
+                /* Описание может содержать стандартные блоки ([[block:…]]),
+                   поэтому идёт через ContentBlocks, а не напрямую в innerHTML:
+                   HTML-куски санитайзятся так же, как раньше. */
+                <ContentBlocks
+                  content={product.fullDesc}
+                  leadSource={`product-${product.slug}`}
                 />
               ) : (
                 <p className="text-sm text-muted-foreground">

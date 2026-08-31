@@ -18,7 +18,7 @@ import { ConfirmDeleteButton } from "@/components/admin/confirm-delete-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { TiptapEditor } from "@/components/admin/tiptap-editor";
+import { PageBuilder } from "@/components/admin/blocks/page-builder";
 import {
   ProductImagesEditor,
   type ProductImageItem,
@@ -302,12 +302,11 @@ export function ProductForm({
                 name="fullDesc"
                 error={errors.fullDesc}
               >
-                <TiptapEditor
+                <PageBuilder
                   value={fullDesc}
                   onChange={setFullDesc}
+                  scope="product"
                   s3Configured={s3Configured}
-                  origin="product"
-                  placeholder="Опишите товар, добавьте характеристики, ссылки и изображения"
                 />
               </Field>
             </CardContent>

@@ -1,14 +1,23 @@
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
+import { ContentBlocks } from "@/components/public/content-blocks";
 import { LeadDialog } from "@/components/public/lead-dialog";
 import { RUSSIA_REGIONS } from "@/components/public/russia-map-regions";
+import {
+  defaultRegionIntro,
+  getRegionContent,
+  REGIONS_BY_SLUG,
+} from "@/lib/region-pages";
 import { defaultMetadata } from "@/lib/seo";
 
-/* Страницы регионов — пока заглушки: заголовок, короткий текст и форма.
-   Тексты и наполнение появятся позже, поэтому страницы закрыты от индексации. */
+/* Страницы регионов: заголовок, вступление и произвольный контент со
+   стандартными блоками — всё правится в /admin/regions.
 
-const BY_SLUG = new Map(RUSSIA_REGIONS.map((region) => [region.slug, region]));
+   Регион без записи в БД показывает текст по умолчанию, поэтому 86 страниц
+   не нужно заполнять руками. Страницы с собственным текстом открыты для
+   индексации, страницы на дефолтном тексте остаются noindex: 86 копий одного
+   абзаца — это дубли, за которые поисковики наказывают. */
 
 export function generateStaticParams() {
   return RUSSIA_REGIONS.map((region) => ({ slug: region.slug }));
@@ -22,13 +31,25 @@ export async function generateMetadata({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const region = BY_SLUG.get(slug);
+  const region = REGIONS_BY_SLUG.get(slug);
+  if (!region) {
+    return defaultMetadata({
+      title: "Регион не найден",
+      path: `/regions/${slug}`,
+      noindex: true,
+    });
+  }
+
+  const custom = await getRegionContent(slug);
+  const hasOwnText = Boolean(custom?.content?.trim() || custom?.intro?.trim());
+
   return defaultMetadata({
-    title: region
-      ? `Поставка медицинского оборудования — ${region.name}`
-      : "Регион не найден",
+    title:
+      custom?.seoTitle?.trim() ||
+      `Поставка медицинского оборудования — ${region.name}`,
+    description: custom?.seoDesc?.trim() || undefined,
     path: `/regions/${slug}`,
-    noindex: true,
+    noindex: !hasOwnText,
   });
 }
 
@@ -38,8 +59,13 @@ export default async function RegionPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const region = BY_SLUG.get(slug);
+  const region = REGIONS_BY_SLUG.get(slug);
   if (!region) notFound();
+
+  const custom = await getRegionContent(slug);
+  const heading = custom?.heading?.trim() || region.name;
+  const intro = custom?.intro?.trim() || defaultRegionIntro();
+  const content = custom?.content?.trim() ?? "";
 
   return (
     <>
@@ -52,11 +78,8 @@ export default async function RegionPage({
 
       <section className="rails container py-10 md:py-14">
         <div className="max-w-3xl">
-          <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-flame-ink">
-            {region.code}
-          </span>
-          <h1 className="mt-3 text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-[2.4rem]">
-            {region.name}
+          <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight text-foreground md:text-[2.4rem]">
+            {heading}
           </h1>
           {region.includes ? (
             <p className="mt-3 text-sm text-muted-foreground">
@@ -65,9 +88,7 @@ export default async function RegionPage({
           ) : null}
 
           <p className="mt-6 max-w-[42rem] text-base leading-7 text-muted-foreground">
-            Поставляем медицинское оборудование и выезжаем на сервис по всему
-            региону. Страница региона в работе — пришлите ТЗ или спецификацию,
-            подготовим предложение со сроком и ценой
+            {intro}
           </p>
 
           <div className="mt-8">
@@ -80,6 +101,15 @@ export default async function RegionPage({
           </div>
         </div>
       </section>
+
+      {content ? (
+        <section className="rails container pb-14">
+          <ContentBlocks
+            content={content}
+            leadSource={`region-${region.slug}`}
+          />
+        </section>
+      ) : null}
     </>
   );
 }

@@ -1,6 +1,6 @@
 // Prisma schema for Erfolg medical equipment site.
 // Entities: catalog (Category/Brand/Product + images/specs/files), requests
-// (Quote/Service/Contact), CMS (Page/BlogPost), auth (AdminUser + AuditLog),
+// (Quote/Service/Contact), CMS (Page/BlogPost/RegionPage), auth (AdminUser + AuditLog),
 // Setting (key/value JSON), MediaAsset.
 
 generator client {
@@ -302,6 +302,24 @@ model Page {
   updatedAt   DateTime @updatedAt
 
   @@map("pages")
+}
+
+model RegionPage {
+  id          String   @id @default(cuid())
+  // Слаг региона из src/components/public/russia-map-regions.ts — источником
+  // списка регионов остаётся код, здесь хранится только редактируемый текст.
+  slug        String   @unique
+  // Пусто = используется заголовок региона по умолчанию (его название).
+  heading     String?
+  intro       String?  @db.Text
+  content     String   @db.Text
+  seoTitle    String?
+  seoDesc     String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("region_pages")
 }
 
 model BlogPost {

@@ -109,11 +109,22 @@
     overflow-x: clip;
     overscroll-behavior-x: none;
   }
-  /* Плавная докрутка для переходов по якорям и программного скролла.
-     На колесо мыши это не влияет — там шаг задаёт браузер. */
-  html { scroll-behavior: smooth; }
+  /* Плавная докрутка — только для якорей внутри страницы (:target) и там,
+     где её явно просят классом .scroll-smooth.
+
+     Глобальный `scroll-behavior: smooth` на html ломал переход на новую
+     страницу: Next при навигации возвращает скролл наверх, браузер начинал
+     анимировать прокрутку с текущей позиции, и новая страница открывалась
+     не с начала, а с середины — тем заметнее, чем ниже был клик. */
+  html:has(:target),
+  html.scroll-smooth {
+    scroll-behavior: smooth;
+  }
   @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
+    html:has(:target),
+    html.scroll-smooth {
+      scroll-behavior: auto;
+    }
   }
   /* Место под полосу прокрутки держим всегда — тогда её пропажа не двигает
      вёрстку вбок. */

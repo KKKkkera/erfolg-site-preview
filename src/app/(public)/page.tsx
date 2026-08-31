@@ -396,7 +396,7 @@ export default async function HomePage() {
           </div>
 
           <div className="relative z-20 mx-auto min-w-0 max-w-[44rem] text-center lg:mx-0 lg:max-w-[46%] lg:text-left xl:max-w-[44rem]">
-            <h1 className="max-w-[44rem] text-balance text-[1.75rem] font-semibold leading-[1.25] tracking-tight text-foreground sm:text-[2.2rem] lg:text-[2.6rem] xl:text-[3rem]">
+            <h1 className="max-w-[44rem] text-balance text-[1.75rem] font-semibold leading-[1.15] tracking-tight text-foreground sm:text-[2.2rem] lg:text-[2.6rem] xl:text-[3rem]">
               <span className="block sm:inline">Поставка и{" "}ремонт</span>{" "}
               <span className="block sm:inline">медицинской техники</span>{" "}
               {/* Акцент — не заливка текста и не жирная черта, а тонкая
@@ -412,7 +412,7 @@ export default async function HomePage() {
 
             {/* Абзац переносится сам: жёсткие переносы по фразам были
                 подогнаны под 375px и на других ширинах давали рваный край. */}
-            <p className="mx-auto mt-6 max-w-[36rem] text-pretty text-[15px] leading-7 text-muted-foreground md:text-base md:leading-8 lg:mx-0">
+            <p className="mx-auto mt-6 max-w-[36rem] text-pretty text-[15px] leading-6 text-muted-foreground md:text-base md:leading-7 lg:mx-0">
               Собственный сервисный центр, плановое техническое
               обслуживание, ремонт, проверка. Поставка оборудования по
               техническому заданию, документация по 44‑ФЗ и 223‑ФЗ

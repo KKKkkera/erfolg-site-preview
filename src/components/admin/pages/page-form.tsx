@@ -17,7 +17,7 @@ import { ConfirmDeleteButton } from "@/components/admin/confirm-delete-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { TiptapEditor } from "@/components/admin/tiptap-editor";
+import { PageBuilder } from "@/components/admin/blocks/page-builder";
 import {
   hasPublicCmsRoute,
   isCodeManagedCmsSlug,
@@ -177,15 +177,15 @@ export function PageForm({
           <CardTitle className="text-base">Содержимое</CardTitle>
         </CardHeader>
         <CardContent>
-          <Field label="Контент" name="content" error={errors.content}>
-            <TiptapEditor
-              value={content}
-              onChange={setContent}
-              s3Configured={s3Configured}
-              origin="page"
-              placeholder="Введите содержимое страницы…"
-            />
-          </Field>
+          <PageBuilder
+            value={content}
+            onChange={setContent}
+            scope="page"
+            s3Configured={s3Configured}
+          />
+          {errors.content ? (
+            <p className="mt-2 text-xs text-destructive">{errors.content}</p>
+          ) : null}
         </CardContent>
       </Card>
 
