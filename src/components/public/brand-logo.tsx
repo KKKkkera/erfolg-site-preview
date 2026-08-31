@@ -13,12 +13,6 @@ type BrandLogoProps = {
   imgClassName?: string;
   /** Логотип в шапке — выше сгиба, грузим с приоритетом */
   priority?: boolean;
-  /* Легаси-пропсы текстового логотипа: принимаются и игнорируются,
-     чтобы старые вызовы не падали по типам. */
-  subtitleClassName?: string;
-  titleClassName?: string;
-  markClassName?: string;
-  showSubtitle?: boolean;
 };
 
 /**

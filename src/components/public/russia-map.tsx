@@ -13,8 +13,7 @@ import {
    поэтому Курилы подсвечиваются вместе с Сахалином, а Земля Франца-Иосифа —
    с Архангельской областью. При наведении показываем название, по клику ведём
    на страницу региона.
-   Тот же набор контуров лежит отдельным файлом: public/maps/russia-regions.svg,
-   и переносимым пакетом: packages/russia-regions-map. */
+   Тот же набор контуров лежит отдельным файлом: public/maps/russia-regions.svg. */
 export function RussiaMap({ className }: { className?: string }) {
   const [hovered, setHovered] = useState<RussiaRegion | null>(null);
 

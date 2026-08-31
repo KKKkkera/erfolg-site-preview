@@ -705,7 +705,7 @@ export function getPublicLicenseSummary(value: string | null | undefined): strin
   return "Лицензия Росздравнадзора на техническое обслуживание медицинских изделий. Подлинность подтверждается через реестр Росздравнадзора по ИНН организации.";
 }
 
-export function getPublicLicenseDocumentNote(_scanUrl?: string | null): string {
+export function getPublicLicenseDocumentNote(): string {
   // С 2022 года Росздравнадзор не выдаёт лицензии в виде бумажных бланков
   // строгой отчётности (постановление Правительства РФ № 353). Лицензия —
   // это запись в Едином реестре лицензий; подлинность проверяется онлайн.
