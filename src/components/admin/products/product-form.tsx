@@ -23,6 +23,10 @@ import {
   ProductImagesEditor,
   type ProductImageItem,
 } from "@/components/admin/products/product-images-editor";
+import {
+  ProductFilesEditor,
+  type ProductFileItem,
+} from "@/components/admin/products/product-files-editor";
 import { deleteProduct, saveProduct } from "@/server/actions/admin/products";
 import { slugify } from "@/lib/slugify";
 
@@ -54,6 +58,7 @@ export type ProductFormInitial = {
   homeSort?: number;
   homeBadge?: string | null;
   images?: ProductImageItem[];
+  files?: ProductFileItem[];
 };
 
 export function ProductForm({
@@ -564,6 +569,30 @@ export function ProductForm({
               ) : (
                 <div className="rounded-md border border-dashed p-4 text-center text-xs text-muted-foreground">
                   Сначала сохраните товар — затем добавите фото.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Документы</CardTitle>
+              <CardDescription>
+                {mode === "create"
+                  ? "Доступно после создания товара."
+                  : "РУ, декларации, инструкции. Документ со словом «спецификация» или «технич» в названии становится кнопкой «Скачать спецификацию» на странице товара."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {mode === "edit" && initial?.id ? (
+                <ProductFilesEditor
+                  productId={initial.id}
+                  initial={initial.files ?? []}
+                  s3Configured={s3Configured}
+                />
+              ) : (
+                <div className="rounded-md border border-dashed p-4 text-center text-xs text-muted-foreground">
+                  Сначала сохраните товар — затем добавите документы.
                 </div>
               )}
             </CardContent>

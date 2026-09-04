@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/table";
 import { Breadcrumbs } from "@/components/public/breadcrumbs";
 import { ContentBlocks } from "@/components/public/content-blocks";
-import { CornerBrackets } from "@/components/public/decor";
 import { ProductCard } from "@/components/public/product-card";
 import { RegBadge } from "@/components/public/reg-badge";
 import { LeadDialog } from "@/components/public/lead-dialog";
@@ -202,9 +201,6 @@ export default async function ProductPage(props: ProductPageProps) {
                   unoptimized={heroImageUrl.endsWith(".svg")}
                   priority
                 />
-                <div className="absolute inset-3">
-                  <CornerBrackets className="text-flame/50" />
-                </div>
               </div>
             </div>
             {product.images.length > 1 ? (
@@ -229,7 +225,7 @@ export default async function ProductPage(props: ProductPageProps) {
           </div>
 
           {/* Инфо */}
-          <div className="md:sticky md:top-24 md:self-start">
+          <div className="md:self-start">
             <div className="space-y-4">
               <h1 className="text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[1.8rem]">
                 {product.name}
@@ -242,16 +238,6 @@ export default async function ProductPage(props: ProductPageProps) {
                 {product.model ? (
                   <span className="normal-case tracking-normal">
                     {product.model}
-                  </span>
-                ) : null}
-                {/* Состояние — существенное условие закупки. Пока оно жило
-                    только внутри названия, при беглом просмотре его теряли. */}
-                {product.isUsed ? (
-                  <span
-                    className="rounded-sm border border-warning/40 bg-warning/10 px-1.5 py-0.5 text-[11px] tracking-[0.1em] text-foreground"
-                    title="Бывшее в употреблении, после сервисной проверки"
-                  >
-                    Б/У
                   </span>
                 ) : null}
               </div>

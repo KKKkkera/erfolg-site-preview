@@ -24,7 +24,16 @@ export default async function EditProductPage(
     alt: string | null;
     sort: number;
   };
-  type ProductWithImages = ProductBase & { images: ProductImageRow[] };
+  type ProductFileRow = {
+    id: string;
+    url: string;
+    label: string;
+    sort: number;
+  };
+  type ProductWithImages = ProductBase & {
+    images: ProductImageRow[];
+    files: ProductFileRow[];
+  };
 
   let product: ProductWithImages | null = null;
   let categories: { id: string; name: string }[] = [];
@@ -33,7 +42,10 @@ export default async function EditProductPage(
     const [p, cats, br] = await Promise.all([
       db.product.findUnique({
         where: { id: params.id },
-        include: { images: { orderBy: { sort: "asc" } } },
+        include: {
+          images: { orderBy: { sort: "asc" } },
+          files: { orderBy: { sort: "asc" } },
+        },
       }),
       db.category.findMany({
         select: { id: true, name: true },
@@ -103,6 +115,12 @@ export default async function EditProductPage(
             url: img.url,
             alt: img.alt,
             sort: img.sort,
+          })),
+          files: product.files.map((file) => ({
+            id: file.id,
+            url: file.url,
+            label: file.label,
+            sort: file.sort,
           })),
         }}
         categories={categories}
