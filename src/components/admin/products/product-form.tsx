@@ -42,6 +42,7 @@ export type ProductFormInitial = {
   categoryId?: string;
   kind?: "EQUIPMENT" | "CONSUMABLE" | "SPARE_PART";
   status?: "DRAFT" | "ACTIVE" | "ARCHIVED";
+  isUsed?: boolean;
   shortDesc?: string | null;
   fullDesc?: string | null;
   regNumber?: string | null;
@@ -98,6 +99,7 @@ export function ProductForm({
     const fd = new FormData(e.currentTarget);
     const payload = {
       id: initial?.id,
+      isUsed: fd.get("isUsed") === "on",
       name: String(fd.get("name") ?? ""),
       slug: String(fd.get("slug") ?? ""),
       sku: String(fd.get("sku") ?? ""),
@@ -263,6 +265,10 @@ export function ProductForm({
                     <option value="SPARE_PART">Запчасть</option>
                   </select>
                 </Field>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" name="isUsed" defaultChecked={initial?.isUsed ?? false} disabled={pending} />
+                  Оборудование Б/У
+                </label>
                 <Field label="Статус" name="status" error={errors.status}>
                   <select
                     id="status"

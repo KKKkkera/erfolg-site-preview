@@ -25,7 +25,7 @@ export const FORMS_DISABLED =
  * иначе при снятии maintenance индексация всё ещё будет закрыта.
  */
 export const SEO_BLOCK_INDEX =
-  process.env.NEXT_PUBLIC_SEO_BLOCK_INDEX === "true" || FORMS_DISABLED;
+  process.env.NEXT_PUBLIC_SEO_BLOCK_INDEX === "true";
 
 export const MAINTENANCE_CONTACT = {
   phone: "+7 928 895 70 70",

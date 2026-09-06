@@ -1,6 +1,12 @@
 import type { MetadataRoute } from "next";
 
 import { getCatalogSlugs } from "@/lib/sitemap-data";
+import {
+  getIndexableBrands,
+  getIndexableCategories,
+} from "@/lib/catalog-taxonomy";
+import { getIndexableRegionSlugs } from "@/lib/region-pages";
+import { DELIVERY_CITIES } from "@/lib/delivery-cities";
 import { db, isDatabaseConfigured } from "@/lib/db";
 
 // Генерировать на запросе, а не на билде. Иначе Next пререндерит sitemap
@@ -37,23 +43,11 @@ const STATIC_ROUTES: StaticEntry[] = [
   { path: "/contacts", priority: 0.7, changeFrequency: "monthly" },
   { path: "/reviews", priority: 0.6, changeFrequency: "monthly" },
   { path: "/works", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/regions", priority: 0.6, changeFrequency: "monthly" },
   { path: "/delivery", priority: 0.5, changeFrequency: "monthly" },
   { path: "/warranty", priority: 0.5, changeFrequency: "monthly" },
   { path: "/license", priority: 0.5, changeFrequency: "yearly" },
   { path: "/licenses", priority: 0.5, changeFrequency: "monthly" },
-];
-
-const REGIONAL_CITIES = [
-  "grozny",
-  "vladikavkaz",
-  "makhachkala",
-  "nazran",
-  "nalchik",
-  "stavropol",
-  "cherkessk",
-  "rostov",
-  "krasnodar",
-  "voronezh",
 ];
 
 const LEGAL_ROUTES: StaticEntry[] = [
@@ -67,10 +61,6 @@ function abs(path: string): string {
   return `${SITE_URL}${path === "/" ? "" : path}`;
 }
 
-// Хардкодим дату последней правки статических маршрутов. Каждый раз когда
-// меняется их контент — обновляем эту константу. Бот видит стабильный
-// timestamp и не считает, что мы трогаем сайт каждую секунду.
-const STATIC_LAST_MODIFIED = new Date("2026-08-12T00:00:00Z");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
@@ -78,10 +68,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const r of STATIC_ROUTES) {
     entries.push({
       url: abs(r.path),
-      lastModified: STATIC_LAST_MODIFIED,
       changeFrequency: r.changeFrequency,
       priority: r.priority,
     });
+  }
+
+  // Разделы каталога и производители. Только непустые: посадочная без товаров
+  // ведёт в пустую выдачу, в индексе ей делать нечего.
+  try {
+    const [categories, brands] = await Promise.all([
+      getIndexableCategories(),
+      getIndexableBrands(),
+    ]);
+
+    for (const c of categories) {
+      entries.push({
+        url: abs(`/catalog/category/${c.slug}`),
+        changeFrequency: "weekly",
+        priority: 0.8,
+      });
+    }
+
+    for (const b of brands) {
+      entries.push({
+        url: abs(`/catalog/brand/${b.slug}`),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      });
+    }
+  } catch (e) {
+    console.error("sitemap/taxonomy error", e);
   }
 
   // Товары
@@ -109,20 +125,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const r of LEGAL_ROUTES) {
     entries.push({
       url: abs(r.path),
-      lastModified: STATIC_LAST_MODIFIED,
       changeFrequency: r.changeFrequency,
       priority: r.priority,
     });
   }
 
-  // Региональные посадочные
-  for (const city of REGIONAL_CITIES) {
+  // Городские посадочные. Список берём из delivery-cities.ts — того же файла,
+  // из которого строятся сами маршруты: держать здесь копию слагов означало
+  // забыть про неё при добавлении города.
+  for (const city of DELIVERY_CITIES) {
     entries.push({
-      url: abs(`/postavka/${city}`),
-      lastModified: STATIC_LAST_MODIFIED,
+      url: abs(`/postavka/${city.slug}`),
       changeFrequency: "monthly",
       priority: 0.6,
     });
+  }
+
+  // Регионы — только с собственным текстом: страница на дефолтном абзаце
+  // отдаёт noindex (см. regions/[slug]/page.tsx), и в карте сайта ей не место.
+  try {
+    const regions = await getIndexableRegionSlugs();
+    for (const [slug, updatedAt] of regions) {
+      entries.push({
+        url: abs(`/regions/${slug}`),
+        lastModified: updatedAt,
+        changeFrequency: "monthly",
+        priority: 0.5,
+      });
+    }
+  } catch (e) {
+    console.error("sitemap/regions error", e);
   }
 
   // Статьи блога

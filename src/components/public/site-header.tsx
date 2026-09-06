@@ -8,8 +8,8 @@ import {
   type CatalogMenuCategory,
 } from "@/components/public/catalog-mega-menu";
 import { CatalogSearch } from "@/components/public/catalog-search";
+import { MobileCatalogButton } from "@/components/public/mobile-catalog-button";
 import { MobileNav } from "@/components/public/mobile-nav";
-import { MobileSearch } from "@/components/public/mobile-search";
 import { LeadDialog } from "@/components/public/lead-dialog";
 import { SocialLinks } from "@/components/public/social-links";
 import { db } from "@/lib/db";
@@ -141,7 +141,7 @@ export async function SiteHeader() {
                 <Link
                   key={`${item.href}-${item.label}`}
                   href={item.href}
-                  className="whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-foreground"
+                  className="whitespace-nowrap rounded-md px-2.5 py-2 text-[0.9375rem] font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-foreground"
                 >
                   {item.label}
                 </Link>
@@ -150,19 +150,19 @@ export async function SiteHeader() {
           </nav>
 
           <div className="ml-auto flex min-w-0 items-center gap-2 lg:flex-1">
-            <CatalogSearch placeholder={searchPlaceholder} />
+            <div className="hidden min-w-0 flex-1 min-[1120px]:block">
+              <CatalogSearch placeholder={searchPlaceholder} />
+            </div>
 
             <a
               href={telHref(siteConfig.contacts.phonePrimary)}
               className="hidden h-10 items-center gap-2.5 rounded-md border border-border px-3.5 transition-colors hover:bg-accent xl:flex"
             >
               <Phone className="h-3.5 w-3.5 text-flame-ink" aria-hidden="true" />
-              <span className="whitespace-nowrap font-mono text-[13px] font-medium tracking-tight text-foreground">
+              <span className="whitespace-nowrap font-mono text-[0.8125rem] font-medium tracking-tight text-foreground">
                 {siteConfig.contacts.phonePrimary}
               </span>
             </a>
-
-            <MobileSearch placeholder={searchPlaceholder} />
 
             <a
               href={telHref(siteConfig.contacts.phonePrimary)}
@@ -175,7 +175,7 @@ export async function SiteHeader() {
             <div className="hidden md:inline-flex">
               <LeadDialog
                 source="header-cta"
-                triggerLabel="Получить КП"
+                triggerLabel="Запросить сервис"
                 triggerVariant="accent"
                 triggerClassName="h-10 px-5"
               />
@@ -185,6 +185,19 @@ export async function SiteHeader() {
           </div>
         </div>
 
+        {/* Вторая строка — только на телефоне и планшете: каталог и поиск
+            вынесены из-под иконок в постоянную полосу. Это два самых частых
+            действия, а раньше каталог жил внутри бургера, а поиск
+            разворачивался по кнопке — оба в один тап не открывались. */}
+        <div className="border-t border-border min-[1120px]:hidden">
+          <div className="container flex items-center gap-2.5 py-2.5">
+            <MobileCatalogButton categories={catalogMenu} />
+
+            <div className="min-w-0 flex-1">
+              <CatalogSearch placeholder={searchPlaceholder} mobile />
+            </div>
+          </div>
+        </div>
       </header>
     </div>
   );

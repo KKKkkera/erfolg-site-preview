@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { db } from "@/lib/db";
 import { logAction } from "@/lib/audit";
+import { deleteRequestAttachments } from "@/lib/attachment-links";
 import { requireAdmin } from "@/server/actions/admin/auth";
 
 const StatusSchema = z.enum(["NEW", "IN_PROGRESS", "DONE", "REJECTED"]);
@@ -87,10 +88,19 @@ export async function deleteRequest(
 
   try {
     if (t.data === "quote") {
+      const request = await db.quoteRequest.findUnique({ where: { id }, select: { attachments: true } });
+      if (!request) return { ok: true };
+      await deleteRequestAttachments(request.attachments);
       await db.quoteRequest.delete({ where: { id } });
     } else if (t.data === "service") {
+      const request = await db.serviceRequest.findUnique({ where: { id }, select: { attachments: true } });
+      if (!request) return { ok: true };
+      await deleteRequestAttachments(request.attachments);
       await db.serviceRequest.delete({ where: { id } });
     } else {
+      const request = await db.contactRequest.findUnique({ where: { id }, select: { attachments: true } });
+      if (!request) return { ok: true };
+      await deleteRequestAttachments(request.attachments);
       await db.contactRequest.delete({ where: { id } });
     }
     await logAction(

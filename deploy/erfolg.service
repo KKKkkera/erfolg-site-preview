@@ -1,0 +1,46 @@
+# Юнит systemd для боевого запуска. Устанавливается как
+# /etc/systemd/system/erfolg.service
+#
+# Запускается standalone-сборка (.next/standalone/server.js) — Next кладёт
+# туда минимальный сервер со своим node_modules, полный npm ci на сервере
+# для запуска не нужен.
+
+[Unit]
+Description=Erfolg site (Next.js)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=erfolg
+Group=erfolg
+WorkingDirectory=/srv/erfolg/current
+
+# Секреты отдельным файлом с правами 600: в юните их держать нельзя,
+# systemctl show показывает Environment= любому пользователю.
+EnvironmentFile=/etc/erfolg/erfolg.env
+
+ExecStart=/usr/bin/node .next/standalone/server.js
+
+Restart=always
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+# Приложение пишет только в свой каталог; всё остальное закрыто.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/srv/erfolg/current/.next/cache
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=erfolg
+
+[Install]
+WantedBy=multi-user.target

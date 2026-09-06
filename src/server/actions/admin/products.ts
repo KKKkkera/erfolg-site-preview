@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/lib/db";
+import { revalidateCatalog } from "@/lib/catalog-revalidation";
 import { slugify } from "@/lib/slugify";
 import { pingIndexNow } from "@/lib/indexnow";
 import { logAction } from "@/lib/audit";
@@ -22,6 +24,7 @@ const ProductInput = z
     categoryId: z.string().trim().min(1, "Выберите категорию"),
     kind: z.enum(["EQUIPMENT", "CONSUMABLE", "SPARE_PART"]),
     status: z.enum(["DRAFT", "ACTIVE", "ARCHIVED"]),
+    isUsed: z.boolean().default(false),
     shortDesc: z.string().trim().max(2000).optional().or(z.literal("")),
     fullDesc: z.string().trim().max(20000).optional().or(z.literal("")),
     regNumber: z.string().trim().max(120).optional().or(z.literal("")),
@@ -113,6 +116,7 @@ export async function saveProduct(
     categoryId: data.categoryId,
     kind: data.kind,
     status: data.status,
+    isUsed: data.isUsed,
     shortDesc: data.shortDesc?.trim() ? data.shortDesc.trim() : null,
     fullDesc: data.fullDesc?.trim() ? data.fullDesc.trim() : null,
     regNumber: data.regNumber?.trim() ? data.regNumber.trim() : null,
@@ -147,15 +151,14 @@ export async function saveProduct(
     }
 
     revalidatePath("/admin/products");
+    revalidateCatalog();
     revalidatePath(`/admin/products/${id}`);
-    revalidatePath("/catalog");
-    revalidatePath("/");
 
     // IndexNow ping (no-op без INDEXNOW_KEY). Fire-and-forget.
     // Страниц категорий нет — категория живёт только как фильтр каталога,
     // поэтому пингуем саму карточку и общий /catalog.
     if (data.status === "ACTIVE") {
-      void pingIndexNow([`/catalog/${slug}`, "/catalog"]);
+      after(() => pingIndexNow([`/catalog/${slug}`, "/catalog"]));
     }
 
     return { ok: true, id };
@@ -181,10 +184,11 @@ export async function deleteProduct(id: string) {
     await db.product.delete({ where: { id } });
     await logAction(admin.id, "delete", "Product", id);
     revalidatePath("/admin/products");
+    revalidateCatalog();
     revalidatePath("/");
 
     if (before?.slug) {
-      void pingIndexNow([`/catalog/${before.slug}`, "/catalog"]);
+      after(() => pingIndexNow([`/catalog/${before.slug}`, "/catalog"]));
     }
 
     return { ok: true as const };

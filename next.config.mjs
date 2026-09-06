@@ -27,10 +27,35 @@ const databaseConfigured = Boolean(process.env.DATABASE_URL?.trim());
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  ...(process.env.VERCEL ? {} : { output: 'standalone' }),
+  // Собственный сервер (Selectel): standalone кладёт в .next/standalone
+  // минимальный сервер со своими node_modules — его и запускаем в проде.
+  output: 'standalone',
   trailingSlash: false,
   poweredByHeader: false,
   compress: true,
+  experimental: { cpus: 2 },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" },
+          ...(siteUrl.protocol === 'https:' ? [{ key: 'Strict-Transport-Security', value: 'max-age=31536000' }] : []),
+        ],
+      },
+      ...['/admin/:path*', '/api/admin/:path*'].map(source => ({
+        source,
+        headers: [
+          { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+          { key: 'Cache-Control', value: 'private, no-store' },
+        ],
+      })),
+    ];
+  },
   images: {
     // AVIF/WebP вместо исходных PNG — на главной это разница ~1.2 МБ → ~70 КБ
     // на картинку. Порядок важен: Next отдаёт первый формат, который принял браузер.

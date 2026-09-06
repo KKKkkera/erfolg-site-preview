@@ -91,6 +91,7 @@ export default async function EditProductPage(
           categoryId: product.categoryId,
           kind: product.kind,
           status: product.status,
+          isUsed: product.isUsed,
           shortDesc: product.shortDesc,
           fullDesc: product.fullDesc,
           regNumber: product.regNumber,

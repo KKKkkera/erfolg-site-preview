@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/lib/db";
+import { revalidateCatalog } from "@/lib/catalog-revalidation";
 import { slugify } from "@/lib/slugify";
 import { logAction } from "@/lib/audit";
 import { requireAdmin } from "@/server/actions/admin/auth";
@@ -75,7 +76,7 @@ export async function saveCategory(
       await logAction(admin.id, "create", "Category", id);
     }
     revalidatePath("/admin/categories");
-    revalidatePath("/catalog");
+    revalidateCatalog();
     return { ok: true, id };
   } catch (e) {
     console.error("saveCategory error", e);
@@ -115,7 +116,7 @@ export async function reorderCategories(
       count: ids.length,
     });
     revalidatePath("/admin/categories");
-    revalidatePath("/catalog");
+    revalidateCatalog();
     return { ok: true };
   } catch (e) {
     console.error("reorderCategories error", e);
@@ -138,6 +139,7 @@ export async function deleteCategory(id: string) {
     await db.category.delete({ where: { id } });
     await logAction(admin.id, "delete", "Category", id);
     revalidatePath("/admin/categories");
+    revalidateCatalog();
     return { ok: true as const };
   } catch (e) {
     console.error("deleteCategory error", e);

@@ -10,7 +10,8 @@ import { z } from "zod";
  * Защищает от SSRF и XSS через JavaScript: URLs.
  */
 function isPrivateHost(hostname: string): boolean {
-  const h = hostname.toLowerCase();
+  const h = hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
+  if (h.includes(":") && (!/^[23]/.test(h) || h.startsWith("2001:db8:"))) return true;
   if (
     h === "localhost" ||
     h === "::1" ||

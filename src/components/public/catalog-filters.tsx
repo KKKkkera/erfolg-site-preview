@@ -127,7 +127,7 @@ export function CatalogFilters({
         <FilterIcon />
         <h2 className="tech-label text-muted-foreground">Фильтры</h2>
         {activeCount > 0 ? (
-          <span className="bg-flame/10 px-2 py-0.5 font-mono text-[11px] font-semibold tabular-nums text-flame-ink">
+          <span className="bg-flame/10 px-2 py-0.5 font-mono text-[0.6875rem] font-semibold tabular-nums text-flame-ink">
             {activeCount}
           </span>
         ) : null}
@@ -171,7 +171,7 @@ export function CatalogFilters({
                           />
                           <span className="flex-1 leading-5">{cat.name}</span>
                           {typeof cat.count === "number" ? (
-                            <span className="shrink-0 font-mono text-[11px] tabular-nums text-muted-foreground">
+                            <span className="shrink-0 font-mono text-[0.6875rem] tabular-nums text-muted-foreground">
                               {cat.count}
                             </span>
                           ) : null}

@@ -47,7 +47,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
 
       <div className="flex flex-1 flex-col gap-2.5 p-3 sm:gap-3 sm:p-4">
         {product.brand?.name || product.model ? (
-          <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1 font-mono text-[0.625rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
             {product.brand?.name ? <span>{product.brand.name}</span> : null}
             {product.model ? (
               <span className="normal-case tracking-normal text-foreground/60">
@@ -57,7 +57,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
         ) : null}
 
-        <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug tracking-tight text-foreground sm:text-[15px]">
+        <h3 className="line-clamp-2 text-[0.8125rem] font-semibold leading-snug tracking-tight text-foreground sm:text-[0.9375rem]">
           <Link
             href={detailHref}
             className="transition-colors after:absolute after:inset-0 after:z-[1] after:content-[''] hover:text-primary focus-visible:outline-none"
@@ -77,7 +77,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         <div className="-mx-3 mt-auto flex items-center justify-between border-t border-border/40 px-3 pt-2.5 sm:-mx-4 sm:px-4">
           {/* Ссылка не в акцентном цвете: в сетке из дюжины карточек она
               перетягивала внимание с названий товаров. */}
-          <span className="text-[12px] font-medium text-muted-foreground transition-colors group-hover:text-primary sm:text-[13px]">
+          <span className="text-[0.75rem] font-medium text-muted-foreground transition-colors group-hover:text-primary sm:text-[0.8125rem]">
             Подробнее
           </span>
           <ChevronRight

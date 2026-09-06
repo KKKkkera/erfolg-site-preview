@@ -40,7 +40,7 @@ function BrandInner({
   }
 
   return (
-    <span className="max-w-[190px] text-center font-heading text-[15px] font-semibold leading-tight tracking-[-0.02em] text-foreground/70 transition-colors duration-300 group-hover:text-foreground md:text-base">
+    <span className="max-w-[11.875rem] text-center font-heading text-[0.9375rem] font-semibold leading-tight tracking-[-0.02em] text-foreground/70 transition-colors duration-300 group-hover:text-foreground md:text-base">
       {manufacturer.name}
     </span>
   );
@@ -69,12 +69,12 @@ function ManufacturerList({
         return (
           <li
             key={`${hidden ? "clone-" : ""}${manufacturer.slug}`}
-            className="group flex h-20 w-[208px] shrink-0 items-stretch border-r guide-border md:h-24 md:w-[232px]"
+            className="group flex h-20 w-[13rem] shrink-0 items-stretch border-r guide-border md:h-24 md:w-[14.5rem]"
             title={manufacturer.name}
           >
             {clickable ? (
               <Link
-                href={`/catalog?brand=${manufacturer.slug}`}
+                href={`/catalog/brand/${manufacturer.slug}`}
                 className={cell}
                 aria-label={`Каталог: ${manufacturer.name}`}
                 tabIndex={hidden ? -1 : undefined}
@@ -184,11 +184,19 @@ export function BrandStrip({ brands }: { brands: BrandStripItem[] }) {
         <span className="brand-strip-mark brand-strip-mark-bl" aria-hidden="true" />
         <span className="brand-strip-mark brand-strip-mark-br" aria-hidden="true" />
 
-        <div className="relative z-10 hidden w-[250px] shrink-0 items-center border-r guide-border bg-white px-7 lg:flex xl:w-[280px] xl:px-8">
-          <p className="font-mono text-[15px] font-medium leading-[1.55] text-foreground">
-            Работаем с 2012 года
+        {/* Ширина в rem, а не в px: кегль подписи растёт вместе с корневым
+            font-size на широких мониторах, и колонка в пикселях оставалась
+            прежней — строка «Работаем с 2012 года» ломалась пополам и текст
+            выходил за высоту ленты. 15.625rem = те же 250px при базе 16px. */}
+        <div className="relative z-10 hidden w-[15.625rem] shrink-0 items-center border-r guide-border bg-white px-7 lg:flex xl:w-[17.5rem] xl:px-8">
+          {/* Переносы — жёсткие: три строки под высоту ленты. text-balance
+              здесь не подходит, разбивка задана по смыслу фразы.
+              text-nowrap на строках защищает от повторного залома, если
+              подпись всё же окажется в узкой колонке. */}
+          <p className="font-mono text-[0.9375rem] font-medium leading-[1.55] text-foreground">
+            <span className="whitespace-nowrap">Работаем с 2012 года</span>
             <br />
-            только с проверенным
+            <span className="whitespace-nowrap">только с проверенным</span>
             <br />
             оборудованием
           </p>

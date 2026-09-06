@@ -63,6 +63,10 @@ const LINK_GROUPS: {
       { href: "/catalog", label: "Каталог" },
       { href: "/about", label: "О компании" },
       { href: "/works", label: "Реализованные проекты" },
+      // Хаб географии: единственная ссылка, ведущая бота к 86 региональным
+      // страницам и городским лендингам — карта на главной рисуется скриптом
+      // и в HTML-ответе ссылок не оставляет.
+      { href: "/regions", label: "География поставок" },
       { href: "/reviews", label: "Отзывы" },
       { href: "/blog", label: "Блог" },
       { href: "/contacts", label: "Контакты" },
@@ -148,7 +152,7 @@ export async function SiteFooter() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-[13px] leading-6 transition-colors hover:text-white sm:text-sm"
+                      className="text-[0.8125rem] leading-6 transition-colors hover:text-white sm:text-sm"
                     >
                       {item.label}
                     </Link>

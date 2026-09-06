@@ -26,7 +26,7 @@ function catalogLinks(
 ): { href: string; label: string }[] {
   if (categories.length === 0) return siteConfig.nav.catalog;
   return categories.map((category) => ({
-    href: `/catalog?category=${encodeURIComponent(category.slug)}`,
+    href: `/catalog/category/${category.slug}`,
     label: category.name,
   }));
 }
@@ -111,7 +111,49 @@ export function MobileNav({
           </Link>
         </SheetHeader>
 
-        <nav className="flex-none px-5" aria-label="Основные разделы">
+        {/* Контакты и CTA — сразу под шапкой, до списка разделов: звонок и
+            заявка это то, ради чего меню чаще всего и открывают, а внизу
+            панели до них надо было прокручивать весь список разделов.
+            Порядок внутри блока: телефон → почта → соцсети → кнопка КП. */}
+        <div className="flex-none border-b border-border px-5 pb-6 pt-5">
+          <a
+            href={telHref(siteConfig.contacts.phonePrimary)}
+            className="flex items-center gap-3"
+          >
+            <Phone className="h-4 w-4 shrink-0 text-flame-ink" aria-hidden="true" />
+            <span>
+              <span className="block font-mono text-[1.0625rem] font-semibold leading-tight text-foreground">
+                {siteConfig.contacts.phonePrimary}
+              </span>
+              <span className="mt-1 block font-mono text-[0.6875rem] text-muted-foreground">
+                Пн–Пт 09:00–18:00
+              </span>
+            </span>
+          </a>
+
+          <a
+            href={`mailto:${siteConfig.contacts.email}`}
+            className="mt-4 flex items-center gap-3 text-sm text-foreground"
+          >
+            <Mail className="h-4 w-4 shrink-0 text-flame-ink" aria-hidden="true" />
+            {siteConfig.contacts.email}
+          </a>
+
+          <SocialLinks
+            className="mt-5 gap-2.5"
+            itemClassName="grid h-10 w-10 place-items-center border border-border text-foreground/70 transition-colors hover:border-primary hover:text-foreground"
+            iconClassName="h-[18px] w-[18px]"
+          />
+
+          <LeadDialog
+            source="mobile-cta"
+            triggerLabel="Запросить сервис"
+            triggerVariant="accent"
+            triggerClassName="mt-5 h-12 w-full text-base"
+          />
+        </div>
+
+        <nav className="flex-none px-5 pb-6" aria-label="Основные разделы">
           {siteConfig.nav.primary.map((item) =>
             item.href === "/catalog" ? (
               <div key={item.href} className="border-b border-border/70">
@@ -120,7 +162,7 @@ export function MobileNav({
                   onClick={() => setCatalogOpen((prev) => !prev)}
                   aria-expanded={catalogOpen}
                   aria-controls="mobile-catalog-sections"
-                  className="flex w-full items-center justify-between py-4 text-left text-[17px] font-medium text-foreground"
+                  className="flex w-full items-center justify-between py-4 text-left text-[1.0625rem] font-medium text-foreground"
                 >
                   {item.label}
                   <ChevronDown
@@ -145,7 +187,7 @@ export function MobileNav({
                       <Link
                         href="/catalog"
                         onClick={close}
-                        className="py-2.5 text-[15px] leading-snug text-foreground/80"
+                        className="py-2.5 text-[0.9375rem] leading-snug text-foreground/80"
                       >
                         Весь каталог
                       </Link>
@@ -154,7 +196,7 @@ export function MobileNav({
                           key={section.href}
                           href={section.href}
                           onClick={close}
-                          className="py-2.5 text-[15px] leading-snug text-foreground/80"
+                          className="py-2.5 text-[0.9375rem] leading-snug text-foreground/80"
                         >
                           {section.label}
                         </Link>
@@ -168,54 +210,13 @@ export function MobileNav({
                 key={item.href}
                 href={item.href}
                 onClick={close}
-                className="block border-b border-border/70 py-4 text-[17px] font-medium text-foreground last:border-b-0"
+                className="block border-b border-border/70 py-4 text-[1.0625rem] font-medium text-foreground last:border-b-0"
               >
                 {item.label}
               </Link>
             ),
           )}
         </nav>
-
-        {/* Контакты — продолжение того же списка: та же бумага, те же поля. */}
-        <div className="mt-auto flex-none px-5 pb-6 pt-6">
-          <a
-            href={telHref(siteConfig.contacts.phonePrimary)}
-            className="flex items-center gap-3"
-          >
-            <Phone className="h-4 w-4 shrink-0 text-flame-ink" aria-hidden="true" />
-            <span>
-              <span className="block font-mono text-[17px] font-semibold leading-tight text-foreground">
-                {siteConfig.contacts.phonePrimary}
-              </span>
-              <span className="mt-1 block font-mono text-[11px] text-muted-foreground">
-                Пн–Пт 09:00–18:00
-              </span>
-            </span>
-          </a>
-
-          <a
-            href={`mailto:${siteConfig.contacts.email}`}
-            className="mt-4 flex items-center gap-3 text-sm text-foreground"
-          >
-            <Mail className="h-4 w-4 shrink-0 text-flame-ink" aria-hidden="true" />
-            {siteConfig.contacts.email}
-          </a>
-
-          <SocialLinks
-            className="mt-5 gap-2.5"
-            itemClassName="grid h-10 w-10 place-items-center border border-border text-foreground/70 transition-colors hover:border-primary hover:text-foreground"
-            iconClassName="h-[18px] w-[18px]"
-          />
-
-          <div className="mt-5">
-            <LeadDialog
-              source="mobile-cta"
-              triggerLabel="Получить КП"
-              triggerVariant="accent"
-              triggerClassName="h-12 w-full text-base"
-            />
-          </div>
-        </div>
       </SheetContent>
     </Sheet>
   );

@@ -40,55 +40,9 @@ function HomeBadge({ text }: { text: string | null }) {
   if (!text) return null;
 
   return (
-    <span className="pointer-events-none absolute left-2 top-2 z-[2] bg-flame/10 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.06em] text-flame-ink sm:left-4 sm:top-4 sm:px-3 sm:py-1 sm:text-[11px] sm:tracking-[0.08em]">
+    <span className="pointer-events-none absolute left-2 top-2 z-[2] bg-flame/10 px-1.5 py-0.5 font-mono text-[0.5625rem] font-semibold uppercase tracking-[0.06em] text-flame-ink sm:left-4 sm:top-4 sm:px-3 sm:py-1 sm:text-[0.6875rem] sm:tracking-[0.08em]">
       {text}
     </span>
-  );
-}
-
-/**
- * Крупная плитка: картинка сверху, подпись снизу — как у малых, только
- * крупнее. Занимает обе строки сетки.
- */
-function FeaturedTile({ product }: { product: BentoProduct }) {
-  const img = imageOf(product);
-
-  return (
-    <article className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-colors duration-200 hover:border-primary active:border-primary-dark has-[a:focus-visible]:outline has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ring col-span-2 row-span-2 lg:min-h-[32rem]">
-      <div className="relative min-h-0 flex-1 bg-white">
-        <HomeBadge text={product.homeBadge} />
-        <div className="relative h-full w-full min-h-[22rem]">
-          <Image
-            src={img.src}
-            alt={img.alt}
-            fill
-            sizes="(min-width: 1024px) 46vw, 50vw"
-            className="object-contain p-8 transform-gpu will-change-transform [backface-visibility:hidden] transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-            draggable={false}
-            unoptimized={img.svg}
-          />
-        </div>
-      </div>
-
-      {/* Высота подписи — минимум, а не фикс: на 1440px имя в две строки
-          плюс модель не помещались в 8rem, и текст упирался в нижний край. */}
-      <div className="flex min-h-32 flex-none flex-col gap-3 border-t border-border px-8 py-6">
-        <h3 className="text-balance text-[1.6rem] font-semibold leading-snug tracking-tight text-foreground">
-          <Link
-            href={detailHref(product)}
-            className="transition-colors after:absolute after:inset-0 after:z-[1] after:content-[''] hover:text-primary focus-visible:outline-none"
-          >
-            {product.name}
-          </Link>
-        </h3>
-
-        {product.model ? (
-          <p className="font-mono text-sm text-muted-foreground">
-            {product.model}
-          </p>
-        ) : null}
-      </div>
-    </article>
   );
 }
 
@@ -100,12 +54,12 @@ function SmallTile({ product }: { product: BentoProduct }) {
     <article className="group relative flex flex-col overflow-hidden rounded-lg border border-border bg-white transition-colors duration-200 hover:border-primary active:border-primary-dark has-[a:focus-visible]:outline has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ring">
       <div className="relative min-h-0 flex-1 bg-white">
         <HomeBadge text={product.homeBadge} />
-        <div className="relative h-32 w-full sm:h-40 lg:h-44">
+        <div className="relative h-32 w-full sm:h-40 lg:h-52">
           <Image
             src={img.src}
             alt={img.alt}
             fill
-            sizes="(min-width: 1024px) 17vw, 50vw"
+            sizes="(min-width: 1024px) 31vw, 50vw"
             className="object-contain p-4 sm:p-5 lg:p-6 transform-gpu will-change-transform [backface-visibility:hidden] transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
             draggable={false}
             unoptimized={img.svg}
@@ -113,8 +67,8 @@ function SmallTile({ product }: { product: BentoProduct }) {
         </div>
       </div>
 
-      <div className="flex min-h-[4.75rem] flex-none flex-col gap-1.5 border-t border-border p-3 sm:min-h-[5.25rem] sm:p-4 lg:h-32 lg:min-h-0 lg:gap-2 lg:p-5">
-        <h3 className="line-clamp-2 text-[13px] font-semibold leading-snug tracking-tight text-foreground sm:text-sm lg:text-[15px]">
+      <div className="flex min-h-[4.75rem] flex-none flex-col gap-1.5 border-t border-border p-3 sm:min-h-[5.25rem] sm:p-4 lg:h-24 lg:min-h-0 lg:gap-2 lg:p-5">
+        <h3 className="line-clamp-2 text-[0.8125rem] font-semibold leading-snug tracking-tight text-foreground sm:text-sm lg:text-[0.9375rem]">
           <Link
             href={detailHref(product)}
             className="transition-colors after:absolute after:inset-0 after:z-[1] after:content-[''] hover:text-primary focus-visible:outline-none"
@@ -122,7 +76,7 @@ function SmallTile({ product }: { product: BentoProduct }) {
             {product.name}
           </Link>
         </h3>
-        <p className="line-clamp-1 font-mono text-[10px] font-medium uppercase tracking-[0.1em] text-muted-foreground lg:text-[11px] lg:tracking-[0.12em]">
+        <p className="line-clamp-1 font-mono text-[0.625rem] font-medium uppercase tracking-[0.1em] text-muted-foreground lg:text-[0.6875rem] lg:tracking-[0.12em]">
           {product.model ?? product.category}
         </p>
       </div>
@@ -130,9 +84,9 @@ function SmallTile({ product }: { product: BentoProduct }) {
   );
 }
 
-/** Позиций на слайде: на десктопе крупная плитка плюс четыре мелких,
-    на телефоне — четыре равные, сеткой два на два. */
-const PAGE_SIZE = 5;
+/** Позиций на слайде: на десктопе три равные плитки в ряд,
+    на телефоне — четыре, сеткой два на два. */
+const PAGE_SIZE = 3;
 const COMPACT_PAGE_SIZE = 4;
 /** Пауза автопрокрутки по умолчанию, мс. Меняется в админке:
     настройка home.bento_autoplay_seconds. */
@@ -146,14 +100,12 @@ function chunk(products: BentoProduct[], size: number): BentoProduct[][] {
   return pages;
 }
 
-/** Страница десктопа: крупная плитка 2×2 слева и четыре мелких справа. */
+/** Страница десктопа: три равные плитки в ряд. Крупной плитки нет —
+    блок стал ниже, следующая секция попадает в первый экран. */
 function BentoGrid({ products }: { products: BentoProduct[] }) {
-  const [featured, ...smalls] = products;
-
   return (
-    <div className="grid grid-cols-4 grid-rows-2 gap-4">
-      <FeaturedTile product={featured} />
-      {smalls.map((p) => (
+    <div className="grid grid-cols-3 gap-4">
+      {products.map((p) => (
         <SmallTile key={p.id} product={p} />
       ))}
     </div>
@@ -242,6 +194,7 @@ export function ProductBento({
     embla.reInit();
   }, [embla, compact, pages.length]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Synchronize the initial snapshot of the external Embla instance, then subscribe to its events. */
   useEffect(() => {
     if (!embla) return;
     onSelect();
@@ -250,6 +203,7 @@ export function ProductBento({
       embla.off("select", onSelect).off("reInit", onSelect);
     };
   }, [embla, onSelect]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Просили не анимировать — оставляем ручное листание без автопрокрутки.
   useEffect(() => {

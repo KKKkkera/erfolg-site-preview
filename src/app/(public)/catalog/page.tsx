@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { db } from "@/lib/db";
@@ -8,22 +8,60 @@ import { CatalogFilters } from "@/components/public/catalog-filters";
 import { CatalogPagination } from "@/components/public/catalog-pagination";
 import { EmptyState } from "@/components/public/empty-state";
 import { JsonLd } from "@/components/seo/json-ld";
+import {
+  loadCatalogProducts,
+  parseCatalogPage,
+  productCountWord,
+  PAGE_SIZE,
+  type CatalogProducts,
+} from "@/lib/catalog-query";
 import { defaultMetadata } from "@/lib/seo";
 import { breadcrumbListSchema, itemListSchema } from "@/lib/schema";
 import { withTimeoutFallback } from "@/lib/with-timeout-fallback";
 
 export const revalidate = 120;
 
-const PAGE_SIZE = 24;
-
-export const metadata = defaultMetadata({
-  title: "Каталог медицинского оборудования",
-  description:
-    "Каталог медицинской техники ООО «Эрфольг»: оборудование, расходные материалы, запчасти. Регистрационное удостоверение Росздравнадзора, доставка по России.",
-  path: "/catalog",
-});
-
 type SearchParams = Record<string, string | string[] | undefined>;
+
+const CATALOG_DESCRIPTION =
+  "Каталог медицинской техники ООО «Эрфольг»: оборудование, расходные материалы, запчасти. Регистрационное удостоверение Росздравнадзора, доставка по России.";
+
+/**
+ * Метаданные зависят от строки запроса, поэтому это функция, а не константа.
+ *
+ * Страницы пагинации получают собственный canonical (?page=N) и свой заголовок:
+ * со статичным canonical на /catalog все страницы выдачи схлопывались в одну,
+ * и товары со второй и дальше в индекс не попадали.
+ *
+ * Выдача с фильтрами — noindex, follow. Комбинаций категория×бренд×вид×состояние
+ * тысячи, содержимое у них пересекается, и в индексе это дубли каталога; follow
+ * оставлен, чтобы вес по ссылкам на карточки всё равно тёк.
+ */
+export async function generateMetadata(props: {
+  searchParams: Promise<SearchParams>;
+}): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+
+  const hasFilters =
+    pickArr(searchParams.category).length > 0 ||
+    Boolean(pickStr(searchParams.brand)) ||
+    Boolean(pickStr(searchParams.kind)) ||
+    Boolean(pickStr(searchParams.condition)) ||
+    (pickStr(searchParams.q) ?? "").trim().length >= 2;
+
+  const page = parseCatalogPage(searchParams.page);
+
+  return defaultMetadata({
+    title:
+      page > 1
+        ? `Каталог медицинского оборудования — страница ${page}`
+        : "Каталог медицинского оборудования",
+    description: CATALOG_DESCRIPTION,
+    path: page > 1 ? `/catalog?page=${page}` : "/catalog",
+    noindex: hasFilters,
+    followWhenNoindex: true,
+  });
+}
 
 function pickStr(v: string | string[] | undefined): string | undefined {
   if (!v) return undefined;
@@ -33,15 +71,6 @@ function pickStr(v: string | string[] | undefined): string | undefined {
 function pickArr(v: string | string[] | undefined): string[] {
   if (!v) return [];
   return Array.isArray(v) ? v : [v];
-}
-
-function productCountWord(count: number): string {
-  const lastTwo = count % 100;
-  if (lastTwo >= 11 && lastTwo <= 14) return "товаров";
-  const last = count % 10;
-  if (last === 1) return "товар";
-  if (last >= 2 && last <= 4) return "товара";
-  return "товаров";
 }
 
 export default async function CatalogPage(
@@ -55,12 +84,11 @@ export default async function CatalogPage(
   const selectedKind = pickStr(searchParams.kind);
   const selectedCondition = pickStr(searchParams.condition);
   const selectedQuery = (pickStr(searchParams.q) ?? "").trim();
-  const pageRaw = parseInt(pickStr(searchParams.page) ?? "1", 10);
-  const page = Number.isFinite(pageRaw) && pageRaw > 0 ? pageRaw : 1;
+  const page = parseCatalogPage(searchParams.page);
 
   let categories: FilterOption[] = [];
   let brands: FilterOption[] = [];
-  let products: Awaited<ReturnType<typeof loadProducts>> = {
+  let products: CatalogProducts = {
     items: [],
     total: 0,
   };
@@ -80,8 +108,7 @@ export default async function CatalogPage(
         label: "catalog.brands",
         timeoutMs: 1200,
       }),
-      withTimeoutFallback(
-        loadProducts({
+      loadCatalogProducts({
           categorySlugs: selectedCategories,
           brandSlug: selectedBrand,
           kind: selectedKind,
@@ -89,15 +116,9 @@ export default async function CatalogPage(
           query: selectedQuery,
           page,
         }),
-        {
-          fallback: { items: [], total: 0 },
-          label: "catalog.products",
-          timeoutMs: 1200,
-        },
-      ),
     ]);
   } catch (e) {
-    console.error("catalog/page load error", e);
+    throw e;
   }
 
   const totalPages = Math.max(1, Math.ceil(products.total / PAGE_SIZE));
@@ -123,7 +144,7 @@ export default async function CatalogPage(
             url: "/catalog",
             items: products.items.map((p) => ({
               name: p.name,
-              url: `/catalog/${p.category?.slug ?? "all"}/${p.slug}`,
+              url: `/catalog/${p.slug}`,
               image: p.images[0]?.url ?? null,
             })),
           })}
@@ -262,70 +283,4 @@ async function loadBrandFilters(): Promise<FilterOption[]> {
   return brands
     .map((b) => ({ slug: b.slug, name: b.name, count: byBrandId.get(b.id) ?? 0 }))
     .filter((b) => b.count > 0);
-}
-
-async function loadProducts({
-  categorySlugs,
-  brandSlug,
-  kind,
-  condition,
-  query,
-  page,
-}: {
-  categorySlugs: string[];
-  brandSlug?: string;
-  kind?: string;
-  condition?: string;
-  query?: string;
-  page: number;
-}) {
-  const where: Prisma.ProductWhereInput = { status: "ACTIVE" };
-  if (query && query.length >= 2) {
-    where.OR = [
-      { name: { contains: query, mode: "insensitive" } },
-      { sku: { contains: query, mode: "insensitive" } },
-      { model: { contains: query, mode: "insensitive" } },
-      { shortDesc: { contains: query, mode: "insensitive" } },
-    ];
-  }
-  if (categorySlugs.length > 0) {
-    // В фильтре стоят категории верхнего уровня, а товары лежат в подкатегориях
-    // («Реанимация» → «Аппараты ИВЛ»). Совпадение по точному slug давало пустую
-    // выдачу по всем разделам, где нет товаров, лежащих в корне напрямую.
-    where.category = {
-      OR: [
-        { slug: { in: categorySlugs } },
-        { parent: { slug: { in: categorySlugs } } },
-      ],
-    };
-  }
-  if (brandSlug) {
-    where.brand = { slug: brandSlug };
-  }
-  if (
-    kind === "EQUIPMENT" ||
-    kind === "CONSUMABLE" ||
-    kind === "SPARE_PART"
-  ) {
-    where.kind = kind;
-  }
-  if (condition === "used") where.isUsed = true;
-  else if (condition === "new") where.isUsed = false;
-
-  const [items, total] = await Promise.all([
-    db.product.findMany({
-      where,
-      include: {
-        brand: true,
-        category: true,
-        images: { take: 1, orderBy: { sort: "asc" } },
-      },
-      orderBy: [{ sort: "asc" }, { createdAt: "desc" }],
-      take: PAGE_SIZE,
-      skip: (page - 1) * PAGE_SIZE,
-    }),
-    db.product.count({ where }),
-  ]);
-
-  return { items, total };
 }

@@ -1,4 +1,6 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
 
 const config: Config = {
   darkMode: ["class"],
@@ -13,7 +15,12 @@ const config: Config = {
          в globals.css и там же растут по брейкпоинтам; от --page-gutter
          считаются .rails и .marks. Числом здесь задавать нельзя — разъедется. */
       padding: "calc(var(--page-gutter) + var(--page-pad))",
-      screens: { "2xl": "1400px" },
+      /* Потолок колонки — в rem и той же величиной, что --page-max в
+         globals.css (87.5rem = 1400px при базе 16px). На широких мониторах
+         корневой font-size растёт, и потолок в px заморозил бы рамку на
+         1400px: кегль стал бы крупнее, а колонка нет. Ключ 2xl — это
+         брейкпоинт включения (1400px ширины), значение — сам потолок. */
+      screens: { "2xl": "87.5rem" },
     },
     extend: {
       colors: {
@@ -127,7 +134,7 @@ const config: Config = {
   // (политика ПДн, согласие, cookie, лицензии, «О компании»), в статьях блога
   // и в описании товара. Без плагина эти классы не значат ничего — заголовки
   // не отличались от текста, у списков не было маркеров, ссылки не выделялись.
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+  plugins: [animate, typography],
 };
 
 export default config;

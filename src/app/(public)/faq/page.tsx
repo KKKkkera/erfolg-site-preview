@@ -154,7 +154,7 @@ export default function FaqPage() {
           {FAQ_GROUPS.map((group, gIdx) => (
             <div key={group.title}>
               <div className="flex items-baseline gap-3">
-                <span aria-hidden="true" className="font-mono text-[13px] font-medium text-flame-ink">
+                <span aria-hidden="true" className="font-mono text-[0.8125rem] font-medium text-flame-ink">
                   {String(gIdx + 1).padStart(2, "0")}
                 </span>
                 <h2 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
@@ -167,7 +167,7 @@ export default function FaqPage() {
                     key={`${group.title}-${idx}`}
                     className="group p-5 [&_summary::-webkit-details-marker]:hidden"
                   >
-                    <summary className="flex cursor-pointer items-start justify-between gap-4 text-[15px] font-medium leading-snug text-foreground transition-colors group-hover:text-primary md:text-base">
+                    <summary className="flex cursor-pointer items-start justify-between gap-4 text-[0.9375rem] font-medium leading-snug text-foreground transition-colors group-hover:text-primary md:text-base">
                       <span>{item.q}</span>
                       <span
                         aria-hidden="true"

@@ -145,7 +145,7 @@ export default async function ServicePage() {
                   <div className="grid h-11 w-11 place-items-center rounded-md border border-border bg-surface text-primary transition-colors group-hover:border-primary/50">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <span aria-hidden="true" className="font-mono text-[11px] font-medium text-flame-ink">
+                  <span aria-hidden="true" className="font-mono text-[0.6875rem] font-medium text-flame-ink">
                     {String(idx + 1).padStart(2, "0")}
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export default async function ServicePage() {
                     aria-hidden="true"
                   />
                   <div className="text-sm text-foreground">
-                    <p className="font-mono text-[13px] font-medium leading-6">
+                    <p className="font-mono text-[0.8125rem] font-medium leading-6">
                       {getPublicLicenseSummaryFromSettings(license)}
                     </p>
                     <p className="mt-1 text-muted-foreground">

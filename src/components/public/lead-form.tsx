@@ -19,7 +19,7 @@ import {
 const initialState: LeadFormState = { ok: false };
 
 const FIELD =
-  "h-[54px] w-full border border-border bg-white px-5 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary sm:text-sm";
+  "h-[3.375rem] w-full border border-border bg-white px-5 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary sm:text-sm";
 
 const NAME_MAX = 50;
 const EMAIL_MAX = 160;
@@ -35,7 +35,7 @@ function SubmitButton({ label }: { label: string }) {
       type="submit"
       variant="accent"
       disabled={pending}
-      className="h-[48px] w-full text-[15px]"
+      className="h-[3rem] w-full text-[0.9375rem]"
     >
       {pending ? "Отправка…" : label}
     </Button>
@@ -157,14 +157,14 @@ function LeadFormInner({
           placeholder="Ваш комментарий"
           value={message}
           onChange={(event) => setMessage(event.target.value.slice(0, MESSAGE_MAX))}
-          className={cn(FIELD, "h-auto min-h-[110px] resize-none overscroll-contain py-3.5 leading-6")}
+          className={cn(FIELD, "h-auto min-h-[6.875rem] resize-none overscroll-contain py-3.5 leading-6")}
         />
         <div className="mt-1 text-right text-xs tabular-nums text-muted-foreground/70">
           {message.length}/{MESSAGE_MAX}
         </div>
       </div>
 
-      <label className="flex items-start gap-2.5 text-[11px] leading-4 text-foreground">
+      <label className="flex items-start gap-2.5 text-[0.6875rem] leading-4 text-foreground">
         {/* Без aria-label: он перекрывал имя от родительского label, и
             скринридер не озвучивал ссылки на согласие и политику ПДн */}
         <input

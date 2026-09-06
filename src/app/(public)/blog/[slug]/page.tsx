@@ -19,8 +19,8 @@ async function loadPost(slug: string) {
     return await db.blogPost.findFirst({
       where: { slug, isPublished: true },
     });
-  } catch {
-    return null;
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -103,7 +103,7 @@ export default async function BlogPostPage({
           {post.publishedAt ? (
             <time
               dateTime={post.publishedAt.toISOString()}
-              className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-flame-ink"
+              className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-flame-ink"
             >
               {formatDate(post.publishedAt)}
             </time>
@@ -168,7 +168,7 @@ export default async function BlogPostPage({
                     {r.publishedAt ? (
                       <time
                         dateTime={r.publishedAt.toISOString()}
-                        className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground"
+                        className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted-foreground"
                       >
                         {formatDate(r.publishedAt)}
                       </time>

@@ -66,6 +66,7 @@ export function ClientCarousel({ clients }: { clients: ClientCard[] }) {
     [embla],
   );
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Synchronize the initial snapshot of the external Embla instance, then subscribe to its events. */
   useEffect(() => {
     if (!embla) return;
     setSnaps(embla.scrollSnapList());
@@ -75,6 +76,7 @@ export function ClientCarousel({ clients }: { clients: ClientCard[] }) {
       embla.off("select", onSelect).off("reInit", onSelect);
     };
   }, [embla, onSelect]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (clients.length === 0) return null;
 

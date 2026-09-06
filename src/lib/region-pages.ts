@@ -78,6 +78,40 @@ export async function getRegionContent(
   }
 }
 
+/**
+ * Слаги регионов с собственным текстом — те, что реально открыты к индексации
+ * (страница на дефолтном абзаце отдаёт noindex, см. regions/[slug]/page.tsx).
+ *
+ * Нужны в двух местах: sitemap включает только их, а хаб /regions по этому же
+ * набору решает, какие ссылки вести без rel="nofollow".
+ */
+export async function getIndexableRegionSlugs(): Promise<
+  Map<string, Date>
+> {
+  if (!isDatabaseConfigured) return new Map();
+
+  try {
+    const rows = await withTimeoutFallback(
+      db.regionPage.findMany({
+        where: { isPublished: true },
+        select: { slug: true, intro: true, content: true, updatedAt: true },
+      }),
+      { fallback: [], label: "regions.indexable", timeoutMs: 1500 },
+    );
+
+    // Фильтруем в коде, а не в запросе: «есть непустой текст» — это условие на
+    // два поля с trim, и в SQL оно вышло бы заметно менее читаемым.
+    return new Map(
+      rows
+        .filter((r) => r.content.trim() || r.intro?.trim())
+        .map((r) => [r.slug, r.updatedAt]),
+    );
+  } catch (e) {
+    console.error("getIndexableRegionSlugs error", e);
+    return new Map();
+  }
+}
+
 /** Список для админки: все 86 регионов + признак «есть запись в БД». */
 export async function listRegionsWithStatus(): Promise<
   Array<{

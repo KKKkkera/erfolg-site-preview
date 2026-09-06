@@ -6,11 +6,10 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://erfolgmt.ru";
 
 export default function robots(): MetadataRoute.Robots {
-  // SEO_BLOCK_INDEX охватывает: FORMS_DISABLED (maintenance) +
-  // явный NEXT_PUBLIC_SEO_BLOCK_INDEX=true (dev/staging).
+  // Crawling must remain possible so bots can read the noindex metadata.
   if (SEO_BLOCK_INDEX) {
     return {
-      rules: [{ userAgent: "*", disallow: "/" }],
+      rules: [{ userAgent: "*", allow: "/", disallow: ["/admin/", "/api/"] }],
     };
   }
 

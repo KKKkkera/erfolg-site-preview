@@ -113,12 +113,12 @@ export default async function BlogIndexPage() {
                     {post.publishedAt ? (
                       <time
                         dateTime={post.publishedAt.toISOString()}
-                        className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground"
+                        className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted-foreground"
                       >
                         {formatDate(post.publishedAt)}
                       </time>
                     ) : null}
-                    <span aria-hidden="true" className="font-mono text-[11px] font-medium text-flame-ink">
+                    <span aria-hidden="true" className="font-mono text-[0.6875rem] font-medium text-flame-ink">
                       {String(idx + 1).padStart(2, "0")}
                     </span>
                   </div>
@@ -136,7 +136,7 @@ export default async function BlogIndexPage() {
                     </p>
                   ) : null}
                   {post.authorName ? (
-                    <p className="mt-auto border-t border-border pt-3 font-mono text-[11px] text-muted-foreground">
+                    <p className="mt-auto border-t border-border pt-3 font-mono text-[0.6875rem] text-muted-foreground">
                       Автор: {post.authorName}
                     </p>
                   ) : null}

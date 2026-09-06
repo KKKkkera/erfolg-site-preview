@@ -18,7 +18,7 @@ const badgeVariants = cva(
         /* Петролевая плашка на светлом — для типов/категорий */
         brand: "border-primary/25 bg-primary/[.08] text-primary hover:bg-primary/[.12]",
         /* Технический mono-ярлык */
-        mono: "rounded-sm border-border bg-surface font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground",
+        mono: "rounded-sm border-border bg-surface font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted-foreground",
       },
     },
     defaultVariants: {

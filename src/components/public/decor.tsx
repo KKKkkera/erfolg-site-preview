@@ -100,7 +100,7 @@ export function Stat({
       </div>
       <div
         className={cn(
-          "mt-2.5 font-mono text-[11px] font-medium uppercase leading-4 tracking-[0.14em]",
+          "mt-2.5 font-mono text-[0.6875rem] font-medium uppercase leading-4 tracking-[0.14em]",
           dark ? "text-ink-muted" : "text-muted-foreground",
         )}
       >

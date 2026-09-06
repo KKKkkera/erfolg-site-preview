@@ -23,7 +23,7 @@ function RegionLink({ region }: { region: RegionIndexItem }) {
   return (
     <Link
       href={`/regions/${region.slug}`}
-      className="flex min-h-[2.75rem] items-center justify-between gap-3 border-t border-border/70 px-4 py-2.5 text-[15px] leading-6 text-foreground transition-colors first:border-t-0 active:bg-surface"
+      className="flex min-h-[2.75rem] items-center justify-between gap-3 border-t border-border/70 px-4 py-2.5 text-[0.9375rem] leading-6 text-foreground transition-colors first:border-t-0 active:bg-surface"
     >
       <span className="min-w-0">{region.name}</span>
       <ChevronRight

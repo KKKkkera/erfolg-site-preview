@@ -96,21 +96,27 @@ export function keyFromPublicUrl(url: string): string | null {
     path = url;
   } else {
     try {
-      path = new URL(url).pathname;
+      const parsed = new URL(url);
+      const site = new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://erfolgmt.ru");
+      path = parsed.origin === site.origin ? parsed.pathname : null;
     } catch {
       path = null;
     }
   }
 
   if (path && path.startsWith("/media/")) {
-    const key = decodeURIComponent(path.slice("/media/".length));
-    return key || null;
+    try {
+      const key = decodeURIComponent(path.slice("/media/".length));
+      return key && !key.includes("..") ? key : null;
+    } catch { return null; }
   }
 
   const base = storageBase();
   if (base && url.startsWith(`${base}/`)) {
-    const key = decodeURIComponent(url.slice(base.length + 1).split("?")[0]);
-    return key || null;
+    try {
+      const key = decodeURIComponent(url.slice(base.length + 1).split("?")[0]);
+      return key && !key.includes("..") ? key : null;
+    } catch { return null; }
   }
 
   return null;

@@ -44,17 +44,6 @@ export function CatalogMegaMenu({
   const activeCategory =
     categories.find((category) => category.slug === activeSlug) ?? categories[0];
 
-  if (!activeCategory) {
-    return (
-      <Link
-        href="/catalog"
-        className="whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-foreground"
-      >
-        Каталог
-      </Link>
-    );
-  }
-
   useEffect(() => {
     if (!open) return;
 
@@ -75,6 +64,14 @@ export function CatalogMegaMenu({
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, [open]);
+
+  if (!activeCategory) {
+    return (
+      <Link href="/catalog" className="whitespace-nowrap rounded-md px-2.5 py-2 text-[0.9375rem] font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-foreground">
+        Каталог
+      </Link>
+    );
+  }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
@@ -107,7 +104,7 @@ export function CatalogMegaMenu({
         aria-haspopup="true"
         aria-expanded={open}
         className={cn(
-          "flex items-center gap-0.5 whitespace-nowrap rounded-md px-2.5 py-2 text-[15px] font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-foreground",
+          "flex items-center gap-0.5 whitespace-nowrap rounded-md px-2.5 py-2 text-[0.9375rem] font-medium text-foreground/75 transition-colors hover:bg-accent hover:text-foreground",
           open && "bg-accent text-foreground",
         )}
       >
@@ -152,7 +149,7 @@ export function CatalogMegaMenu({
               {categories.map((category) => (
                 <Link
                   key={category.slug}
-                  href={`/catalog?category=${encodeURIComponent(category.slug)}`}
+                  href={`/catalog/category/${category.slug}`}
                   onMouseEnter={() => setActiveSlug(category.slug)}
                   onFocus={() => setActiveSlug(category.slug)}
                   onClick={() => setOpen(false)}
@@ -179,7 +176,7 @@ export function CatalogMegaMenu({
                 {activeCategory.name}
               </p>
               <Link
-                href={`/catalog?category=${encodeURIComponent(activeCategory.slug)}`}
+                href={`/catalog/category/${activeCategory.slug}`}
                 onClick={() => setOpen(false)}
                 className="whitespace-nowrap text-xs font-medium text-foreground underline decoration-foreground/25 underline-offset-4 transition-colors hover:text-foreground/70 hover:decoration-foreground/60"
               >

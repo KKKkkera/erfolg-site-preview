@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import heroEquipmentDesktop from "../../../public/images/home-v2/hero-equipment-desktop.webp";
-import heroEquipment from "../../../public/images/home-v2/hero-equipment.webp";
 import stepIcon1 from "../../../public/images/icons/step-1.png";
 import stepIcon2 from "../../../public/images/icons/step-2.png";
 import stepIcon3 from "../../../public/images/icons/step-3.png";
@@ -50,9 +49,9 @@ import type { CompanySettings, ContactSettings } from "@/lib/schema";
 export const revalidate = 120;
 
 export const metadata = defaultMetadata({
-  title: "Сервис и поставка медицинской техники для клиник",
+  title: "Ремонт и сервис медицинской техники по всей России",
   description:
-    "Собственный сервисный центр по лицензии Росздравнадзора (ТОМИ): плановое ТО, ремонт, поверка. Поставка медицинской техники под ТЗ и конкурсы 44/223-ФЗ.",
+    "Ремонт и техническое обслуживание медицинской техники по лицензии Росздравнадзора (ТОМИ). Выезд инженера по всей России, оригинальные запчасти, гарантия на работы. Поставка оборудования и запчастей по 44/223-ФЗ.",
   path: "/",
 });
 
@@ -60,26 +59,26 @@ const PROCESS_STEPS = [
   {
     step: "1",
     icon: stepIcon1,
-    title: "Описание задачи",
-    text: "ТЗ, спецификация конкурса, фото неисправного оборудования или краткое описание потребности — достаточно для старта",
+    title: "Заявка",
+    text: "Модель, серийный номер и характер неисправности. Достаточно фото идентификационной таблички — по нему подберём запчасти и оценим объём работ",
   },
   {
     step: "2",
     icon: stepIcon2,
-    title: "Подготовка предложения",
-    text: "Подбираем оборудование, проверяем документы, готовим КП с ценой и сроком поставки. Корректируем спецификацию под требования конкурсной документации",
+    title: "Диагностика",
+    text: "Выезд инженера на объект или удалённая оценка по описанию и фото. По результату — дефектная ведомость и смета с ценой и сроком",
   },
   {
     step: "3",
     icon: stepIcon3,
-    title: "Договор и поставка",
-    text: "Договор по 44/223-ФЗ или коммерческий, поставка в согласованный срок, монтаж и обучение персонала на объекте",
+    title: "Ремонт",
+    text: "Работы на месте или в сервисном центре, только оригинальные запчасти. Акт выполненных работ и гарантия на ремонт и на установленные детали",
   },
   {
     step: "4",
     icon: stepIcon4,
     title: "Сопровождение",
-    text: "Плановое ТО, ремонт по заявке, регулярные поставки расходников и запчастей",
+    text: "Договор на плановое ТО с фиксированным SLA, выезд по заявке, регулярные поставки расходников и запчастей. В том числе по 44/223-ФЗ",
   },
 ];
 
@@ -379,6 +378,9 @@ export default async function HomePage() {
           прозрачный аппарат остаётся отдельным блоком под текстом. */}
       <section className="relative overflow-x-clip border-b guide-border">
         <div className="container relative pb-12 pt-11 md:pb-20 md:pt-20 lg:min-h-[38rem] lg:px-[var(--page-gutter)]">
+          {/* sizes с «0px» ниже lg: картинка там скрыта (hidden lg:block), но
+              priority шлёт preload безусловно, и без этого телефон качал фон,
+              которого всё равно не увидит. */}
           <div className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden lg:block">
             <Image
               src={heroEquipmentDesktop}
@@ -386,7 +388,7 @@ export default async function HomePage() {
               fill
               priority
               quality={90}
-              sizes="(min-width: 1536px) 1400px, 100vw"
+              sizes="(max-width: 1023px) 0px, (min-width: 1536px) 1400px, 100vw"
               className="object-cover object-right-center"
             />
             <div
@@ -395,9 +397,12 @@ export default async function HomePage() {
             />
           </div>
 
-          <div className="relative z-20 mx-auto min-w-0 max-w-[44rem] text-center lg:mx-0 lg:max-w-[46%] lg:text-left xl:max-w-[44rem]">
-            <h1 className="max-w-[44rem] text-balance text-[1.75rem] font-semibold leading-[1.15] tracking-tight text-foreground sm:text-[2.2rem] lg:text-[2.6rem] xl:text-[3rem]">
-              <span className="block sm:inline">Поставка и{" "}ремонт</span>{" "}
+          <div className="relative z-20 min-w-0 max-w-[44rem] text-left lg:max-w-[46%] xl:max-w-[44rem]">
+            {/* Кегль H1 заметно выше H2 секций (text-2xl = 1.5rem): при
+                прежних 1.75rem главный заголовок страницы почти сливался с
+                заголовками блоков и не читался как первый уровень. */}
+            <h1 className="max-w-[44rem] text-balance text-[2rem] font-semibold leading-[1.12] tracking-tight text-foreground min-[430px]:text-[2.25rem] sm:text-[2.6rem] lg:text-[2.8rem] xl:text-[3.15rem]">
+              <span className="block sm:inline">Ремонт и{" "}поставка</span>{" "}
               <span className="block sm:inline">медицинской техники</span>{" "}
               {/* Акцент — не заливка текста и не жирная черта, а тонкая
                   ЭКГ-линия из логотипа под фразой. */}
@@ -412,26 +417,27 @@ export default async function HomePage() {
 
             {/* Абзац переносится сам: жёсткие переносы по фразам были
                 подогнаны под 375px и на других ширинах давали рваный край. */}
-            <p className="mx-auto mt-6 max-w-[36rem] text-pretty text-[15px] leading-6 text-muted-foreground md:text-base md:leading-7 lg:mx-0">
-              Собственный сервисный центр, плановое техническое
-              обслуживание, ремонт, проверка. Поставка оборудования по
-              техническому заданию, документация по 44‑ФЗ и 223‑ФЗ
+            <p className="mt-6 max-w-[36rem] text-pretty text-[0.9375rem] leading-6 text-muted-foreground md:text-base md:leading-7">
+              Собственный сервисный центр с лицензией Росздравнадзора:
+              ремонт, плановое ТО, техническое освидетельствование. Выезд
+              инженера, оригинальные запчасти, гарантия на работы. Поставляем
+              оборудование и запчасти по 44‑ФЗ и 223‑ФЗ
             </p>
 
-            <div className="mx-auto mt-8 w-fit lg:mx-0">
+            <div className="mt-8 w-fit">
               <div className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
                 <LeadDialog
                   source="hero-primary"
-                  triggerLabel="Получить КП"
+                  triggerLabel="Запросить сервис"
                   triggerVariant="accent"
                   triggerSize="lg"
-                  triggerClassName="w-full px-4 text-[15px] sm:px-7 sm:text-base"
+                  triggerClassName="w-full px-4 text-[0.9375rem] sm:px-7 sm:text-base"
                 />
                 <Button
                   asChild
                   variant="outline"
                   size="lg"
-                  className="w-full px-4 text-[15px] sm:px-6 sm:text-base"
+                  className="w-full px-4 text-[0.9375rem] sm:px-6 sm:text-base"
                 >
                   <Link href="/catalog">Открыть каталог</Link>
                 </Button>
@@ -448,24 +454,10 @@ export default async function HomePage() {
 
       <BrandStrip brands={brands} />
 
-      <section className="rails border-b guide-border lg:hidden">
-        <div className="marks container pb-12 pt-10">
-          <div className="relative z-0 mx-auto w-full min-w-0 max-w-[42rem]">
-            <Image
-              src={heroEquipment}
-              alt="Ангиографическая C-дуга с операционным столом и монитором"
-              quality={90}
-              sizes="92vw"
-              className="h-auto w-full object-contain"
-            />
-          </div>
-        </div>
-      </section>
-
       {/* ================= НОВИНКИ (бенто) ================= */}
       {bento.length > 0 ? (
         <section className="rails border-b guide-border">
-          <div className="marks container py-12 md:py-14">
+          <div className="marks container py-9 md:py-11">
             <div className="reveal flex flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-x-8 sm:gap-y-4">
               <h2 className="text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[1.8rem] md:text-[2.1rem]">
                 Новинки и{" "}спецпредложения
@@ -478,98 +470,37 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className="reveal mt-8">
+            <div className="reveal mt-6">
               <ProductBento products={bento} autoplayMs={bentoAutoplayMs} />
             </div>
           </div>
         </section>
       ) : null}
 
-      {/* ================= ГЕОГРАФИЯ РАБОТЫ ================= */}
-      <DeliveryCities />
-
-      {/* ============ 01 — КТО МЫ: ПРОЦЕСС, СЕРВИС, ДОКУМЕНТЫ ============ */}
-      {/* Один смысловой блок: опоры компании, шаги работы, собственный
-          сервисный центр и проверяемые документы. Раньше это были четыре
-          отдельные секции, и связь между ними терялась. */}
-      <section className="rails border-b guide-border">
-        <div className="marks container py-14 md:py-20">
-          {/* --- Как мы работаем --- */}
-          <div className="reveal">
-            <h2 className="text-center text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[1.8rem] md:text-[2.1rem]">
-              Порядок работы с нами
-            </h2>
-            <p className="mx-auto mt-4 max-w-[42rem] text-center text-base leading-7 text-muted-foreground">
-              От первого письма до сервисного сопровождения — четыре шага,
-              на каждом понятно, что происходит и в какой срок
-            </p>
-
-            <div className="mt-7 grid grid-cols-1 gap-2.5 lg:grid-cols-12">
-              {PROCESS_STEPS.map((item, idx) => (
-                <article
-                  key={item.step}
-                  className={`flex flex-col border border-border bg-white p-4 sm:p-6 lg:min-h-[10rem] ${
-                    idx === 1 || idx === 2 ? "lg:col-span-7" : "lg:col-span-5"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    {/* PNG-иконка перекрашивается в фирменный цвет через mask */}
-                    <span
-                      aria-hidden
-                      className="-mt-[2px] h-7 w-7 shrink-0 bg-flame-ink sm:h-8 sm:w-8"
-                      style={{
-                        maskImage: `url(${item.icon.src})`,
-                        WebkitMaskImage: `url(${item.icon.src})`,
-                        maskSize: "contain",
-                        WebkitMaskSize: "contain",
-                        maskRepeat: "no-repeat",
-                        WebkitMaskRepeat: "no-repeat",
-                        maskPosition: "center",
-                        WebkitMaskPosition: "center",
-                      }}
-                    />
-                    <div>
-                      <h4 className="max-w-[20rem] text-[15px] font-semibold leading-tight tracking-[-0.025em] text-foreground sm:text-lg lg:text-xl">
-                        {item.title}
-                      </h4>
-                      <p className="mt-2 max-w-[28rem] text-[13px] leading-5 text-muted-foreground sm:text-sm sm:leading-6">
-                        {item.text}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            <div className="mt-10 flex justify-center">
-              <LeadDialog
-                source="process-steps"
-                triggerLabel="Отправить ТЗ"
-                triggerVariant="accent"
-                triggerSize="lg"
-              />
-            </div>
-          </div>
-
-        </div>
-      </section>
-
       {/* ============ СЕРВИСНЫЙ ЦЕНТР — полоса с параллаксом ============ */}
       {/* Фон закреплён (bg-fixed), текст едет поверх — приём с референса
           medcomp.ru. На мобильных фон обычный: iOS Safari фиксированный
           background не поддерживает и рисует его рывками. */}
       <section
-        className="relative border-b guide-border bg-ink bg-cover bg-no-repeat bg-scroll md:bg-fixed"
+        /* bg-position задан классами, а не инлайн-стилем: на телефоне нужен
+           свой кадр. Снимок 16:9, секция на мобильном узкая и высокая —
+           bg-cover тянет его по высоте и срезает бока, а инженер стоит справа
+           и уходил за кадр. На мобильных берём правую часть (75%), с md
+           возвращаем прежнюю композицию по центру. */
+        className="relative border-b guide-border bg-ink bg-cover bg-no-repeat bg-scroll [background-position:75%_calc(50%+2rem)] md:bg-fixed md:[background-position:center_calc(50%+6rem)]"
         style={{
           backgroundImage: "url('/images/home-v2/service-parallax.webp')",
-          backgroundPosition: "center calc(50% + 6rem)",
         }}
       >
-        {/* Вуаль под текст: слева плотная, справа отпускает — там на снимке
-            инженер у аппарата. */}
+        {/* Вуаль под текст. На десктопе градиент горизонтальный: слева плотно
+            под колонкой текста, справа отпускает — там на снимке инженер.
+            На мобильном текст занимает всю ширину, и горизонтальный градиент
+            прятал бы кадр целиком, поэтому вуаль вертикальная: плотная сверху
+            под заголовком и списком шагов, к низу прозрачнее — там видно
+            инженера у аппарата. */}
         <span
           aria-hidden="true"
-          className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--ink)/0.94)_0%,hsl(var(--ink)/0.82)_42%,hsl(var(--ink)/0.35)_100%)]"
+          className="absolute inset-0 bg-[linear-gradient(to_bottom,hsl(var(--ink)/0.93)_0%,hsl(var(--ink)/0.88)_55%,hsl(var(--ink)/0.55)_100%)] md:bg-[linear-gradient(to_right,hsl(var(--ink)/0.94)_0%,hsl(var(--ink)/0.82)_42%,hsl(var(--ink)/0.35)_100%)]"
         />
 
         <div className="container relative py-16 md:py-24">
@@ -628,6 +559,73 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ============ 01 — КТО МЫ: ПРОЦЕСС, СЕРВИС, ДОКУМЕНТЫ ============ */}
+      {/* Один смысловой блок: опоры компании, шаги работы, собственный
+          сервисный центр и проверяемые документы. Раньше это были четыре
+          отдельные секции, и связь между ними терялась. */}
+      <section className="rails border-b guide-border">
+        <div className="marks container py-14 md:py-20">
+          {/* --- Как мы работаем --- */}
+          <div className="reveal">
+            <h2 className="text-center text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[1.8rem] md:text-[2.1rem]">
+              Порядок работы с нами
+            </h2>
+            <p className="mx-auto mt-4 max-w-[42rem] text-center text-base leading-6 text-muted-foreground sm:leading-7">
+              От заявки до планового обслуживания — четыре шага,
+              на каждом понятно, что происходит и в какой срок
+            </p>
+
+            <div className="mt-7 grid grid-cols-1 gap-2.5 lg:grid-cols-12">
+              {PROCESS_STEPS.map((item) => (
+                <article
+                  key={item.step}
+                  className="flex flex-col border border-border bg-white p-4 sm:p-6 lg:col-span-6 lg:min-h-[10rem]"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* PNG-иконка перекрашивается в фирменный цвет через mask */}
+                    <span
+                      aria-hidden
+                      className="-mt-[2px] h-7 w-7 shrink-0 bg-flame-ink sm:h-8 sm:w-8"
+                      style={{
+                        maskImage: `url(${item.icon.src})`,
+                        WebkitMaskImage: `url(${item.icon.src})`,
+                        maskSize: "contain",
+                        WebkitMaskSize: "contain",
+                        maskRepeat: "no-repeat",
+                        WebkitMaskRepeat: "no-repeat",
+                        maskPosition: "center",
+                        WebkitMaskPosition: "center",
+                      }}
+                    />
+                    <div>
+                      <h4 className="max-w-[20rem] text-[0.9375rem] font-semibold leading-tight tracking-[-0.025em] text-foreground sm:text-lg lg:text-xl">
+                        {item.title}
+                      </h4>
+                      <p className="mt-2 max-w-[28rem] text-[0.8125rem] leading-5 text-muted-foreground sm:text-sm sm:leading-6">
+                        {item.text}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-10 flex justify-center">
+              <LeadDialog
+                source="process-steps"
+                triggerLabel="Отправить ТЗ"
+                triggerVariant="accent"
+                triggerSize="lg"
+              />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= ГЕОГРАФИЯ РАБОТЫ ================= */}
+      <DeliveryCities />
 
       {/* ================= 02 — НАШИ КЛИЕНТЫ ================= */}
       {clients.length > 0 ? (

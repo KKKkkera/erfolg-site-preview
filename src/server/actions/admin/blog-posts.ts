@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 
 import { db } from "@/lib/db";
@@ -109,11 +110,12 @@ export async function saveBlogPost(
       await logAction(admin.id, "create", "BlogPost", id);
     }
     revalidatePath("/admin/blog");
-    revalidatePath("/blog");
+    revalidatePath("/blog", "layout");
+    revalidatePath("/");
     revalidatePath(`/blog/${slug}`);
 
     if (data.isPublished) {
-      void pingIndexNow([`/blog/${slug}`, "/blog"]);
+      after(() => pingIndexNow([`/blog/${slug}`, "/blog"]));
     }
 
     return { ok: true, id };

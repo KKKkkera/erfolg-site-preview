@@ -55,6 +55,7 @@ export function ReviewCarousel({ reviews }: { reviews: ReviewCard[] }) {
     setSelected(embla?.selectedScrollSnap() ?? 0);
   }, [embla]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Synchronize the initial snapshot of the external Embla instance, then subscribe to its events. */
   useEffect(() => {
     if (!embla) return;
     setSnaps(embla.scrollSnapList());
@@ -64,6 +65,7 @@ export function ReviewCarousel({ reviews }: { reviews: ReviewCard[] }) {
       embla.off("select", onSelect).off("reInit", onSelect);
     };
   }, [embla, onSelect]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const active = reviews.find((r) => r.id === openId) ?? null;
 

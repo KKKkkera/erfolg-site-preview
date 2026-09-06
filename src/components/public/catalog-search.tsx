@@ -49,7 +49,9 @@ export function CatalogSearch({
   const liveFilter = pathname === "/catalog";
   /* Ниже xl телефон в шапке сворачивается в иконку, а поле поиска ужимается —
      длинная подсказка «Поиск среди N товаров» там всё равно обрезается,
-     поэтому оставляем короткое слово. */
+     поэтому оставляем короткое слово. В мобильном варианте (вторая строка
+     шапки) поле узкое всегда, и короткая подсказка нужна независимо от
+     этого замера — отсюда `mobile ||` в условии ниже. */
   const [compact, setCompact] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listboxId = useId();
@@ -75,6 +77,7 @@ export function CatalogSearch({
   useEffect(() => {
     if (!liveFilter) return;
     const fromUrl = new URLSearchParams(window.location.search).get("q") ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Initialize from the browser URL when entering catalog search.
     setQuery((prev) => (prev.trim() ? prev : fromUrl));
   }, [liveFilter]);
 
@@ -246,7 +249,7 @@ export function CatalogSearch({
         minLength={2}
         required
         autoComplete="off"
-        placeholder={compact ? "Поиск" : placeholder}
+        placeholder={mobile || compact ? "Искать" : placeholder}
         role="combobox"
         aria-autocomplete="list"
         aria-expanded={showPanel}

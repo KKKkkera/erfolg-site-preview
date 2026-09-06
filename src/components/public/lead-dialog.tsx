@@ -52,12 +52,12 @@ export function LeadDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[92vh] max-w-[540px] gap-0 overflow-y-auto overscroll-contain p-7 sm:p-10 [&>button]:right-6 [&>button]:top-6 [&>button]:opacity-35 [&>button:hover]:opacity-70 [&>button>svg]:h-5 [&>button>svg]:w-5">
+      <DialogContent className="max-h-[92vh] max-w-[33.75rem] gap-0 overflow-y-auto overscroll-contain p-7 sm:p-10 [&>button]:right-6 [&>button]:top-6 [&>button]:opacity-35 [&>button:hover]:opacity-70 [&>button>svg]:h-5 [&>button>svg]:w-5">
         <DialogHeader className="text-center sm:text-center">
-          <DialogTitle className="font-heading text-[26px] font-bold leading-tight text-foreground sm:text-[32px]">
+          <DialogTitle className="font-heading text-[1.625rem] font-bold leading-tight text-foreground sm:text-[2rem]">
             Оставьте заявку
           </DialogTitle>
-          <DialogDescription className="mx-auto max-w-[340px] text-sm text-foreground">
+          <DialogDescription className="mx-auto max-w-[21.25rem] text-sm text-foreground">
             Менеджер свяжется с вами в ближайшее время
           </DialogDescription>
         </DialogHeader>

@@ -81,7 +81,7 @@ export function HomeFaq() {
                         {/* Линия отбивает ответ от вопроса. Отступы по краям
                             те же, что у текста, — не во всю карточку. */}
                         <div className="mx-4 border-t border-border/50 pt-3.5 md:mx-5">
-                          <p className="text-[13px] leading-6 text-muted-foreground md:text-sm md:leading-7">
+                          <p className="text-[0.8125rem] leading-6 text-muted-foreground md:text-sm md:leading-7">
                             {item.a}
                           </p>
                         </div>

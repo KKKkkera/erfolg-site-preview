@@ -55,8 +55,7 @@ async function loadProduct(slug: string) {
       },
     });
   } catch (e) {
-    console.error("product load error", e);
-    return null;
+    throw e;
   }
 }
 
@@ -186,7 +185,7 @@ export default async function ProductPage(props: ProductPageProps) {
                   {KIND_LABEL[product.kind] ?? product.kind}
                 </span>
                 {product.sku ? (
-                  <span className="truncate font-mono text-[11px] text-muted-foreground">
+                  <span className="truncate font-mono text-[0.6875rem] text-muted-foreground">
                     SKU: {product.sku}
                   </span>
                 ) : null}
@@ -231,7 +230,7 @@ export default async function ProductPage(props: ProductPageProps) {
                 {product.name}
               </h1>
 
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-mono text-[12px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-mono text-[0.75rem] font-medium uppercase tracking-[0.12em] text-muted-foreground">
                 {product.brand?.name ? (
                   <span className="text-foreground">{product.brand.name}</span>
                 ) : null}
@@ -350,7 +349,7 @@ export default async function ProductPage(props: ProductPageProps) {
                           <TableCell className="w-1/3 bg-surface/60 font-medium text-muted-foreground">
                             {spec.key}
                           </TableCell>
-                          <TableCell className="font-mono text-[13px] text-foreground">
+                          <TableCell className="font-mono text-[0.8125rem] text-foreground">
                             {spec.value}
                           </TableCell>
                         </TableRow>
@@ -380,7 +379,7 @@ export default async function ProductPage(props: ProductPageProps) {
                           <TableCell className="w-1/3 bg-surface/60 font-medium text-muted-foreground">
                             {row.label}
                           </TableCell>
-                          <TableCell className="text-[13px] text-foreground">
+                          <TableCell className="text-[0.8125rem] text-foreground">
                             {row.value}
                           </TableCell>
                         </TableRow>

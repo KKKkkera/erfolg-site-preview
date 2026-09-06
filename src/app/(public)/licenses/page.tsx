@@ -88,7 +88,7 @@ export default async function DocumentsPage() {
                 <h3 className="text-base font-semibold tracking-tight text-foreground transition-colors group-hover:text-primary">
                   Лицензия Росздравнадзора (ТОМИ)
                 </h3>
-                <p className="mt-2 font-mono text-[13px] leading-6 text-foreground">
+                <p className="mt-2 font-mono text-[0.8125rem] leading-6 text-foreground">
                   {getPublicLicenseSummaryFromSettings(license)}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">

@@ -61,7 +61,7 @@ export default async function NotFound() {
               source="not-found"
               triggerSize="lg"
               triggerVariant="accent"
-              triggerLabel="Получить КП"
+              triggerLabel="Запросить сервис"
             />
           </div>
         </section>

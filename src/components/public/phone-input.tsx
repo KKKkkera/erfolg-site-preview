@@ -77,7 +77,7 @@ export function PhoneInput({
         }
       }}
       className={cn(
-        "h-[54px] w-full border bg-white px-5 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary sm:text-sm",
+        "h-[3.375rem] w-full border bg-white px-5 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary sm:text-sm",
         invalid ? "border-destructive" : "border-border",
         className,
       )}

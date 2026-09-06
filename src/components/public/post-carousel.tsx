@@ -36,6 +36,7 @@ export function PostCarousel({ posts }: { posts: PostCard[] }) {
     setSelected(embla?.selectedScrollSnap() ?? 0);
   }, [embla]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- Synchronize the initial snapshot of the external Embla instance, then subscribe to its events. */
   useEffect(() => {
     if (!embla) return;
     setSnaps(embla.scrollSnapList());
@@ -45,6 +46,7 @@ export function PostCarousel({ posts }: { posts: PostCard[] }) {
       embla.off("select", onSelect).off("reInit", onSelect);
     };
   }, [embla, onSelect]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (posts.length === 0) return null;
 
@@ -74,7 +76,7 @@ export function PostCarousel({ posts }: { posts: PostCard[] }) {
                 {post.publishedAt ? (
                   <time
                     dateTime={post.publishedAtIso ?? undefined}
-                    className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground"
+                    className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted-foreground"
                   >
                     {post.publishedAt}
                   </time>

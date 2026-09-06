@@ -1,5 +1,5 @@
 import "server-only";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { S3_BUCKET, isS3Configured, s3 } from "@/lib/s3";
@@ -8,7 +8,7 @@ import { S3_BUCKET, isS3Configured, s3 } from "@/lib/s3";
  * Временные ссылки на вложения к заявкам.
  *
  * Вложения содержат ПДн и коммерческие документы клиник, поэтому лежат в
- * закрытом бакете (см. комментарий в request-attachments.ts). Прямой адрес,
+ * закрытом бакете. Прямой адрес,
  * который сохраняется вместе с заявкой, для закрытого файла отдаёт 403 —
  * менеджер не может открыть присланное ТЗ. Поэтому в админке адрес
  * подписывается на лету и живёт ограниченное время.
@@ -19,6 +19,22 @@ import { S3_BUCKET, isS3Configured, s3 } from "@/lib/s3";
 
 /** Сколько живёт подписанная ссылка. Хватает открыть и скачать, но не разослать. */
 export const ATTACHMENT_LINK_TTL_SECONDS = 15 * 60;
+
+export async function deleteRequestAttachments(value: unknown): Promise<void> {
+  if (value == null) return;
+  if (!Array.isArray(value)) throw new Error("Invalid attachment list");
+  const keys = value.map((file) => {
+    if (!file || typeof file !== "object" || typeof file.url !== "string") throw new Error("Invalid attachment");
+    const key = keyFromStoredUrl(file.url);
+    if (!key?.startsWith("requests/") || key.includes("..")) throw new Error("Invalid attachment key");
+    return key;
+  });
+  if (keys.length && !isS3Configured()) throw new Error("Attachment storage unavailable");
+  // Keep the request in the database if storage deletion fails, so it can be retried.
+  for (const key of new Set(keys)) {
+    await s3.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }));
+  }
+}
 
 function endpointHost(): string {
   try {

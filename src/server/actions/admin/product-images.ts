@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/lib/db";
+import { revalidateCatalog } from "@/lib/catalog-revalidation";
 import { logAction } from "@/lib/audit";
 import { requireAdmin } from "@/server/actions/admin/auth";
 
@@ -43,7 +44,7 @@ export async function addProductImage(
       productId: data.productId,
     });
     revalidatePath(`/admin/products/${data.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     revalidatePath("/");
     return {
       ok: true,
@@ -71,7 +72,7 @@ export async function removeProductImage(
       productId: img.productId,
     });
     revalidatePath(`/admin/products/${img.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     revalidatePath("/");
     return { ok: true };
   } catch (e) {
@@ -108,7 +109,7 @@ export async function reorderProductImages(
       count: data.ids.length,
     });
     revalidatePath(`/admin/products/${data.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     revalidatePath("/");
     return { ok: true };
   } catch (e) {

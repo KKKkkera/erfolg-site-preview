@@ -16,6 +16,12 @@ export type DefaultMetadataInput = {
   image?: string;
   type?: "website" | "article";
   noindex?: boolean;
+  /**
+   * Оставить follow при noindex. Для служебной выдачи (каталог с фильтрами):
+   * саму страницу в индекс не берём — это дубль каталога, — но по ссылкам с
+   * неё на карточки товаров бот идти должен.
+   */
+  followWhenNoindex?: boolean;
 };
 
 function abs(path: string): string {
@@ -53,6 +59,7 @@ export function defaultMetadata(input: DefaultMetadataInput): Metadata {
     image = DEFAULT_OG_IMAGE,
     type = "website",
     noindex = false,
+    followWhenNoindex = false,
   } = input;
 
   const ogImage = abs(image);
@@ -68,9 +75,13 @@ export function defaultMetadata(input: DefaultMetadataInput): Metadata {
     // SEO_BLOCK_INDEX здесь обязателен: метаданные страницы перекрывают
     // root layout, поэтому безусловный index:true раньше затирал noindex,
     // выставленный в layout, и «тихий режим» разрешал индексацию.
-    robots:
-      noindex || SEO_BLOCK_INDEX
-        ? { index: false, follow: false, nocache: true }
+    // SEO_BLOCK_INDEX проверяется первым и всегда закрывает follow: в тихом
+    // режиме боту нечего обходить, послабление followWhenNoindex сюда не
+    // распространяется.
+    robots: SEO_BLOCK_INDEX
+      ? { index: false, follow: false, nocache: true }
+      : noindex
+        ? { index: false, follow: followWhenNoindex, nocache: !followWhenNoindex }
         : { index: true, follow: true },
     // В og/twitter бренд тоже снят: он уже передан отдельным полем siteName,
     // дублировать его в заголовке карточки незачем.

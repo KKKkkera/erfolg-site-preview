@@ -28,7 +28,7 @@ export function DeliveryCities() {
           <h2 className="text-2xl font-semibold leading-tight tracking-tight text-foreground sm:text-[1.8rem] md:text-[2.1rem]">
             Работаем по всей России
           </h2>
-          <p className="mx-auto mt-4 max-w-[38rem] text-base leading-7 text-muted-foreground">
+          <p className="mx-auto mt-4 max-w-[38rem] text-base leading-6 text-muted-foreground sm:leading-7">
             Регион на условия и сроки в большинстве случаев не влияет —
             поставляем оборудование и выезжаем на сервис во все федеральные
             округа

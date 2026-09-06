@@ -170,7 +170,7 @@ export default async function ContactsPage() {
               <dd
                 className={
                   "mt-2 text-foreground " +
-                  (row.mono ? "font-mono text-[15px] tracking-tight" : "text-[15px]")
+                  (row.mono ? "font-mono text-[0.9375rem] tracking-tight" : "text-[0.9375rem]")
                 }
               >
                 {row.value}
@@ -239,7 +239,7 @@ function OfficeCard({ office }: { office: Office }) {
             />
             <a
               href={telHref(office.phone)}
-              className="font-mono text-[15px] font-medium transition-colors hover:text-primary"
+              className="font-mono text-[0.9375rem] font-medium transition-colors hover:text-primary"
             >
               {phoneFormatted ?? office.phone}
             </a>
@@ -265,7 +265,7 @@ function OfficeCard({ office }: { office: Office }) {
               className="mt-0.5 h-4 w-4 flex-shrink-0 text-flame-ink"
               aria-hidden="true"
             />
-            <span className="font-mono text-[13px] text-muted-foreground">
+            <span className="font-mono text-[0.8125rem] text-muted-foreground">
               {office.hours}
             </span>
           </li>

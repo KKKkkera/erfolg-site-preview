@@ -2,12 +2,13 @@
 
 import { randomUUID } from "node:crypto";
 
-import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/lib/db";
+import { revalidateCatalog } from "@/lib/catalog-revalidation";
 import { logAction } from "@/lib/audit";
 import {
   S3_BUCKET,
@@ -86,13 +87,15 @@ export async function requestProductFileUpload(
   const baseName = dot >= 0 ? filename.slice(0, dot) : filename;
   const ext = MIME_TO_EXT.get(mime) ?? "bin";
   const slugBase = slugify(baseName) || "document";
-  const key = `products/docs/${randomUUID()}-${slugBase}.${ext}`;
+  const key = `products/docs/${admin.id}/${randomUUID()}-${slugBase}.${ext}`;
 
   try {
     const cmd = new PutObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
       ContentType: mime,
+      ContentLength: size,
+      ContentDisposition: "attachment",
     });
     const uploadUrl = await getSignedUrl(s3, cmd, { expiresIn: 600 });
     return { ok: true, uploadUrl, key, url: publicUrl(key) };
@@ -121,6 +124,14 @@ export async function addProductFile(
   if (!parsed.success) return { ok: false, message: "Некорректные данные" };
   const data = parsed.data;
   try {
+    const key = keyFromPublicUrl(data.url);
+    if (!key?.startsWith(`products/docs/${admin.id}/`) || key.includes("..")) {
+      return { ok: false, message: "Некорректный адрес загруженного документа" };
+    }
+    const object = await s3.send(new HeadObjectCommand({ Bucket: S3_BUCKET, Key: key }));
+    if (!object.ContentLength || object.ContentLength > MAX_SIZE || !MIME_TO_EXT.has(object.ContentType ?? "")) {
+      return { ok: false, message: "Недопустимый размер или тип документа" };
+    }
     const max = await db.productFile.findFirst({
       where: { productId: data.productId },
       orderBy: { sort: "desc" },
@@ -139,7 +150,7 @@ export async function addProductFile(
       label: data.label,
     });
     revalidatePath(`/admin/products/${data.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     return {
       ok: true,
       id: created.id,
@@ -176,7 +187,7 @@ export async function renameProductFile(
       label: data.label,
     });
     revalidatePath(`/admin/products/${file.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     return { ok: true };
   } catch (e) {
     console.error("renameProductFile error", e);
@@ -197,7 +208,7 @@ export async function removeProductFile(
     // из медиатеки, документ больше нигде не переиспользуется.
     if (isS3Configured()) {
       const key = keyFromPublicUrl(file.url);
-      if (key) {
+      if (key?.startsWith("products/docs/") && !key.includes("..")) {
         try {
           await s3.send(
             new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }),
@@ -215,7 +226,7 @@ export async function removeProductFile(
       url: file.url,
     });
     revalidatePath(`/admin/products/${file.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     return { ok: true };
   } catch (e) {
     console.error("removeProductFile error", e);
@@ -248,7 +259,7 @@ export async function reorderProductFiles(
       count: data.ids.length,
     });
     revalidatePath(`/admin/products/${data.productId}`);
-    revalidatePath("/catalog");
+    revalidateCatalog();
     return { ok: true };
   } catch (e) {
     console.error("reorderProductFiles error", e);

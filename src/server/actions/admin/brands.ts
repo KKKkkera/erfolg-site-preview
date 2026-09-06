@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { db } from "@/lib/db";
+import { revalidateCatalog } from "@/lib/catalog-revalidation";
 import { slugify } from "@/lib/slugify";
 import { logAction } from "@/lib/audit";
 import { optionalSafeUrl } from "@/lib/safe-url";
@@ -89,7 +90,7 @@ export async function saveBrand(
       await logAction(admin.id, "create", "Brand", id);
     }
     revalidatePath("/admin/brands");
-    revalidatePath("/catalog");
+    revalidateCatalog();
     revalidatePath("/");
     return { ok: true, id };
   } catch (e) {
@@ -127,6 +128,7 @@ export async function reorderBrands(
       count: parsed.data.ids.length,
     });
     revalidatePath("/admin/brands");
+    revalidateCatalog();
     revalidatePath("/");
     return { ok: true };
   } catch (e) {
@@ -150,6 +152,7 @@ export async function deleteBrand(id: string) {
     await db.brand.delete({ where: { id } });
     await logAction(admin.id, "delete", "Brand", id);
     revalidatePath("/admin/brands");
+    revalidateCatalog();
     revalidatePath("/");
     return { ok: true as const };
   } catch (e) {

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 
 import {
   DeleteObjectCommand,
+  HeadObjectCommand,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -77,13 +78,14 @@ export async function requestUpload(
   const baseName = dot >= 0 ? filename.slice(0, dot) : filename;
   const ext = MIME_TO_EXT.get(mime) ?? "bin";
   const slugBase = slugify(baseName) || "file";
-  const key = `products/${randomUUID()}-${slugBase}.${ext}`;
+  const key = `products/${admin.id}/${randomUUID()}-${slugBase}.${ext}`;
 
   try {
     const cmd = new PutObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
       ContentType: mime,
+      ContentLength: size,
     });
     const uploadUrl = await getSignedUrl(s3, cmd, { expiresIn: 600 });
     return { ok: true, uploadUrl, key, publicUrl: publicUrl(key) };
@@ -119,6 +121,14 @@ export async function confirmUpload(
   }
   const data = parsed.data;
   try {
+    if (!data.key.startsWith(`products/${admin.id}/`) || data.key.includes("..")) {
+      return { ok: false, message: "Некорректный ключ загрузки" };
+    }
+    const object = await s3.send(new HeadObjectCommand({ Bucket: S3_BUCKET, Key: data.key }));
+    if (!object.ContentLength || object.ContentLength > MAX_SIZE || object.ContentLength !== data.size ||
+        object.ContentType !== data.mime || !ALLOWED_MIME.has(object.ContentType)) {
+      return { ok: false, message: "Размер или тип загруженного файла не соответствует запросу" };
+    }
     const url = publicUrl(data.key);
     const created = await db.mediaAsset.create({
       data: {
@@ -175,7 +185,7 @@ export async function deleteMedia(
 
     if (isS3Configured()) {
       const key = keyFromPublicUrl(media.url);
-      if (key) {
+      if (key?.startsWith("products/") && !key.includes("..")) {
         try {
           await s3.send(
             new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key }),

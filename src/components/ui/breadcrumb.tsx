@@ -19,7 +19,7 @@ const BreadcrumbList = React.forwardRef<
   <ol
     ref={ref}
     className={cn(
-      "flex flex-wrap items-center gap-1.5 break-words text-[13px] text-muted-foreground sm:gap-2",
+      "flex flex-wrap items-center gap-1.5 break-words text-[0.8125rem] text-muted-foreground sm:gap-2",
       className
     )}
     {...props}
@@ -82,7 +82,7 @@ const BreadcrumbSeparator = ({
     {...props}
   >
     {children ?? (
-      <span className="font-mono text-[11px] font-medium text-flame-ink/70">/</span>
+      <span className="font-mono text-[0.6875rem] font-medium text-flame-ink/70">/</span>
     )}
   </li>
 )

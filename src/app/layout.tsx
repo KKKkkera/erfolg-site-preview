@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      default: "Erfolg — сервис и поставка медицинской техники",
+      default: "Erfolg — ремонт и сервис медицинской техники по всей России",
       template: "%s | Erfolg",
     },
     description: siteConfig.description,

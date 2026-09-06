@@ -33,7 +33,7 @@ export function EmptyState({
     <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed border-input bg-surface/50 px-6 py-16 text-center">
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute left-4 top-3 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/60"
+        className="pointer-events-none absolute left-4 top-3 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-muted-foreground/60"
       >
         NO DATA
       </span>

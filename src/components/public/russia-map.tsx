@@ -61,7 +61,7 @@ export function RussiaMap({ className }: { className?: string }) {
           читается на тач-устройствах, где ховера нет. */}
       <p
         aria-live="polite"
-        className="mt-4 min-h-[1.75rem] text-center font-mono text-[13px] uppercase tracking-[0.12em] text-flame-ink"
+        className="mt-4 min-h-[1.75rem] text-center font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-flame-ink"
       >
         {hovered ? hovered.name : ""}
       </p>

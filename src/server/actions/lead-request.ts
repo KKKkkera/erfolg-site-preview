@@ -2,10 +2,12 @@
 
 import { z } from "zod";
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { db } from "@/lib/db";
 import { FORMS_DISABLED } from "@/lib/feature-flags";
 import { sendQuoteNotification } from "@/lib/mailer";
+import { allowRequest, requestIp } from "@/lib/rate-limit";
 
 /**
  * Единая форма сайта: имя, телефон, комментарий. Обязателен телефон — почту
@@ -14,7 +16,7 @@ import { sendQuoteNotification } from "@/lib/mailer";
  * поле `source`.
  */
 const LeadSchema = z.object({
-  productId: z.string().optional().nullable(),
+  productId: z.string().max(100).optional().nullable(),
   name: z
     .string()
     .trim()
@@ -48,7 +50,7 @@ const LeadSchema = z.object({
   consent: z.literal(true, {
     errorMap: () => ({ message: "Необходимо согласие на обработку персональных данных" }),
   }),
-  source: z.string().optional(),
+  source: z.string().max(200).optional(),
 });
 
 export type LeadFormState = {
@@ -90,6 +92,15 @@ export async function submitLeadRequest(
 
   const h = await headers();
   try {
+    const ip = requestIp(h);
+    const phone = parsed.data.phone.replace(/\D/g, "");
+    if ((ip && !(await allowRequest("lead-ip", ip, 10, 15 * 60_000))) ||
+        !(await allowRequest("lead-phone", phone, 3, 15 * 60_000))) {
+      return { ok: false, message: "Слишком много заявок. Попробуйте через 15 минут или свяжитесь с нами по телефону." };
+    }
+    if (parsed.data.productId && !(await db.product.findFirst({ where: { id: parsed.data.productId, status: "ACTIVE" }, select: { id: true } }))) {
+      return { ok: false, message: "Товар больше недоступен. Обновите страницу и отправьте запрос снова." };
+    }
     const created = await db.quoteRequest.create({
       data: {
         productId: parsed.data.productId || null,
@@ -99,12 +110,12 @@ export async function submitLeadRequest(
         message: parsed.data.message || null,
         consent: true,
         source: parsed.data.source || null,
-        ip: h.get("x-forwarded-for")?.split(",")[0]?.trim() || null,
-        userAgent: h.get("user-agent") || null,
+        ip,
+        userAgent: h.get("user-agent")?.slice(0, 1000) || null,
       },
       include: { product: { select: { name: true } } },
     });
-    void sendQuoteNotification({
+    after(async () => { await sendQuoteNotification({
       id: created.id,
       name: created.name,
       phone: created.phone,
@@ -112,7 +123,7 @@ export async function submitLeadRequest(
       message: created.message,
       productName: created.product?.name ?? null,
       source: created.source,
-    });
+    }); });
   } catch (e) {
     console.error("lead request error", e);
     return {
