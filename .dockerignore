@@ -1,0 +1,17 @@
+.git
+.gitignore
+README.md
+PROGRESS.md
+KICKOFF_PROMPT.md
+research/
+.next/
+node_modules/
+.env
+.env.local
+.env.development.local
+.env.production.local
+**/*.log
+.DS_Store
+.vscode/
+.idea/
+.claude/
