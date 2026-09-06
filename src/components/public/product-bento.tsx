@@ -184,7 +184,7 @@ export function ProductBento({
     /* Отсчёт до автопрокрутки начинается заново после любой смены слайда:
        свайпнул сам — пауза отсчитывается от этого момента, а не от
        прошлого автоматического хода. */
-    embla?.plugins().autoplay?.reset();
+    embla?.plugins()?.autoplay?.reset();
   }, [embla]);
 
   /* Смена ширины меняет и число плиток на слайде: без reInit embla считает
@@ -209,7 +209,7 @@ export function ProductBento({
   useEffect(() => {
     if (!embla) return;
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    embla.plugins().autoplay?.stop();
+    embla.plugins()?.autoplay?.stop();
   }, [embla]);
 
   if (pages.length === 0) return null;
