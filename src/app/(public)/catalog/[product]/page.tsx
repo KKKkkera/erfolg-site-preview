@@ -198,7 +198,8 @@ export default async function ProductPage(props: ProductPageProps) {
                   sizes="(min-width: 768px) 50vw, 100vw"
                   className="object-contain p-8"
                   unoptimized={heroImageUrl.endsWith(".svg")}
-                  priority
+                  loading="eager"
+                  fetchPriority="high"
                 />
               </div>
             </div>

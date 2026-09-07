@@ -17,6 +17,7 @@
     "db:seed:compliance": "tsx prisma/seeds/compliance-pages.ts",
     "db:seed:reviews": "tsx prisma/seeds/reviews.ts",
     "db:seed:works": "tsx prisma/seeds/works.ts",
+    "db:seed:regions": "tsx scripts/seed-region-pages.ts",
     "db:clear:demo": "tsx prisma/seeds/clear-demo-data.ts",
     "db:studio": "prisma studio",
     "typecheck": "tsc --noEmit --incremental false",
@@ -89,5 +90,11 @@
     "next": {
       "postcss": "$postcss"
     }
-  }
+  },
+  "browserslist": [
+    "chrome 111",
+    "edge 111",
+    "firefox 111",
+    "safari 16.4"
+  ]
 }

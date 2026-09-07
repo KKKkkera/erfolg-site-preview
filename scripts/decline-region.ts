@@ -14,17 +14,31 @@ const IRREGULAR: Record<string, { prep: string; acc: string }> = {
 };
 const INDECLINABLE_REP = new Set(["Марий Эл", "Саха (Якутия)", "Коми", "Тыва", "Алтай", "Башкортостан", "Дагестан", "Татарстан", "Северная Осетия — Алания"]);
 
-function femAdj(w: string, c: "prep" | "acc"): string {
-  if (w.endsWith("ая")) return w.slice(0, -2) + (c === "prep" ? "ой" : "ую");
-  if (w.endsWith("яя")) return w.slice(0, -2) + (c === "prep" ? "ей" : "юю");
-  return w;
+/* Склоняем каждое слово определения, а не только последнее: у «Еврейская
+   автономная область» прилагательных два, и правка хвоста давала
+   «в Еврейская автономной области». */
+function femAdj(phrase: string, c: "prep" | "acc"): string {
+  return phrase
+    .split(" ")
+    .map((w) => {
+      if (w.endsWith("ая")) return w.slice(0, -2) + (c === "prep" ? "ой" : "ую");
+      if (w.endsWith("яя")) return w.slice(0, -2) + (c === "prep" ? "ей" : "юю");
+      return w;
+    })
+    .join(" ");
 }
 // Мягкая основа только у -ний/-ский с мягким согласным? Нет: -ий после
 // шипящей/к/г/х даёт -ом. Практически у всех регионов основа твёрдая: -ом.
-function mascAdj(w: string, c: "prep" | "acc"): string {
-  if (c === "acc") return w;
-  if (w.endsWith("ий") || w.endsWith("ый") || w.endsWith("ой")) return w.slice(0, -2) + "ом";
-  return w;
+function mascAdj(phrase: string, c: "prep" | "acc"): string {
+  if (c === "acc") return phrase;
+  return phrase
+    .split(" ")
+    .map((w) =>
+      w.endsWith("ий") || w.endsWith("ый") || w.endsWith("ой")
+        ? w.slice(0, -2) + "ом"
+        : w,
+    )
+    .join(" ");
 }
 function femNoun(w: string, c: "prep" | "acc"): string {
   // -ия → предл. -ии (Бурятия → Бурятии), вин. -ию

@@ -378,15 +378,21 @@ export default async function HomePage() {
           прозрачный аппарат остаётся отдельным блоком под текстом. */}
       <section className="relative overflow-x-clip border-b guide-border">
         <div className="container relative pb-12 pt-11 md:pb-20 md:pt-20 lg:min-h-[38rem] lg:px-[var(--page-gutter)]">
-          {/* sizes с «0px» ниже lg: картинка там скрыта (hidden lg:block), но
-              priority шлёт preload безусловно, и без этого телефон качал фон,
-              которого всё равно не увидит. */}
+          {/* sizes с «0px» ниже lg: картинка там скрыта (hidden lg:block),
+              и без этого телефон качал бы фон, которого всё равно не увидит.
+
+              eager + fetchPriority вместо preload: это LCP-элемент, но
+              preload шлёт <link> в <head> безусловно — на телефоне он тянул
+              бы скрытую картинку. fetchPriority поднимает приоритет уже
+              найденного в разметке <img>, где sizes="0px" его и отсечёт.
+              (В Next 16 priority объявлен устаревшим в пользу preload.) */}
           <div className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden lg:block">
             <Image
               src={heroEquipmentDesktop}
               alt=""
               fill
-              priority
+              loading="eager"
+              fetchPriority="high"
               quality={90}
               sizes="(max-width: 1023px) 0px, (min-width: 1536px) 1400px, 100vw"
               className="object-cover object-right-center"
@@ -525,9 +531,9 @@ export default async function HomePage() {
                     {idx + 1}
                   </span>
                   <div className="min-w-0">
-                    <h4 className="text-base font-semibold tracking-tight text-white">
+                    <h3 className="text-base font-semibold tracking-tight text-white">
                       {item.title}
-                    </h4>
+                    </h3>
                     <p className="mt-2 text-sm leading-7 text-ink-muted">
                       {item.text}
                     </p>
@@ -599,9 +605,9 @@ export default async function HomePage() {
                       }}
                     />
                     <div>
-                      <h4 className="max-w-[20rem] text-[0.9375rem] font-semibold leading-tight tracking-[-0.025em] text-foreground sm:text-lg lg:text-xl">
+                      <h3 className="max-w-[20rem] text-[0.9375rem] font-semibold leading-tight tracking-[-0.025em] text-foreground sm:text-lg lg:text-xl">
                         {item.title}
-                      </h4>
+                      </h3>
                       <p className="mt-2 max-w-[28rem] text-[0.8125rem] leading-5 text-muted-foreground sm:text-sm sm:leading-6">
                         {item.text}
                       </p>

@@ -10,8 +10,15 @@
  * Снять можно только после получения регистрационного номера РКН и
  * заполнения юр-блока в siteConfig.legal + ответственного в политике.
  */
-export const FORMS_DISABLED =
-  process.env.NEXT_PUBLIC_FORMS_DISABLED === "true";
+/* Значение из .env приходит как есть: `KEY="true"` даёт строку с кавычками,
+   и строгое сравнение с "true" её не ловит — а `KEY="false"` наоборот легко
+   принять за включённый флаг при менее строгой проверке. Снимаем кавычки и
+   регистр один раз здесь, чтобы обе записи читались одинаково. */
+function envFlag(value: string | undefined): boolean {
+  return value?.trim().replace(/^["']|["']$/g, "").toLowerCase() === "true";
+}
+
+export const FORMS_DISABLED = envFlag(process.env.NEXT_PUBLIC_FORMS_DISABLED);
 
 /**
  * SEO-indexing gate (раздельно от форм).
@@ -24,8 +31,9 @@ export const FORMS_DISABLED =
  * Должен быть "false" перед запуском, даже если FORMS_DISABLED="true",
  * иначе при снятии maintenance индексация всё ещё будет закрыта.
  */
-export const SEO_BLOCK_INDEX =
-  process.env.NEXT_PUBLIC_SEO_BLOCK_INDEX === "true";
+export const SEO_BLOCK_INDEX = envFlag(
+  process.env.NEXT_PUBLIC_SEO_BLOCK_INDEX,
+);
 
 export const MAINTENANCE_CONTACT = {
   phone: "+7 928 895 70 70",

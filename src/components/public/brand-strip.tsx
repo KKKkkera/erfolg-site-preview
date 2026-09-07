@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 
@@ -17,23 +18,48 @@ const MARQUEE_SPEED = 63;
 const MARQUEE_HOVER_SPEED = MARQUEE_SPEED / 2;
 const SPEED_EASING = 8;
 
-function BrandInner({
-  manufacturer,
-  hidden,
-}: {
-  manufacturer: BrandStripItem;
-  hidden: boolean;
-}) {
+function BrandInner({ manufacturer }: { manufacturer: BrandStripItem }) {
   if (manufacturer.logo) {
+    const className =
+      "block h-full w-full object-contain opacity-100 grayscale-0 transition duration-300 md:opacity-65 md:grayscale md:group-hover:opacity-100 md:group-hover:grayscale-0";
+
+    /* Векторные логотипы отдаём как есть: оптимизатор next/image их не
+       трогает (dangerouslyAllowSVG выключен), а сами файлы уже мельче
+       любого растра. Растровые — только через next/image: исходники
+       лежат в двух-трёх тысячах пикселей по ширине, а плитка занимает
+       144×32, и без ресайза лента тянула ~400 КБ лишнего трафика. */
+    if (manufacturer.logo.endsWith(".svg")) {
+      return (
+        <span className="block h-8 w-36">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={manufacturer.logo}
+            alt={manufacturer.name}
+            className={className}
+            loading="lazy"
+            decoding="async"
+          />
+        </span>
+      );
+    }
+
     return (
-      <span className="block h-8 w-36">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+      <span className="relative block h-8 w-36">
+        <Image
           src={manufacturer.logo}
           alt={manufacturer.name}
-          className="block h-full w-full object-contain opacity-100 grayscale-0 transition duration-300 md:opacity-65 md:grayscale md:group-hover:opacity-100 md:group-hover:grayscale-0"
-          loading={hidden ? "lazy" : "eager"}
-          decoding="async"
+          fill
+          /* Плитка фиксированная — 144×32 CSS-пикселей. sizes отдаёт
+             оптимизатору эту ширину, иначе fill просит вариант под всю
+             ширину вьюпорта. */
+          sizes="144px"
+          className={className}
+          /* Всегда lazy, в том числе для видимой ленты: next/image на
+             eager-картинку добавляет <link rel="preload"> в <head>, и
+             три десятка логотипов начинали соперничать с hero за канал —
+             LCP от этого только страдал. Лента идёт под первым экраном,
+             ей достаточно ленивой загрузки. */
+          loading="lazy"
         />
       </span>
     );
@@ -79,11 +105,11 @@ function ManufacturerList({
                 aria-label={`Каталог: ${manufacturer.name}`}
                 tabIndex={hidden ? -1 : undefined}
               >
-                <BrandInner manufacturer={manufacturer} hidden={hidden} />
+                <BrandInner manufacturer={manufacturer} />
               </Link>
             ) : (
               <span className={cell}>
-                <BrandInner manufacturer={manufacturer} hidden={hidden} />
+                <BrandInner manufacturer={manufacturer} />
               </span>
             )}
           </li>

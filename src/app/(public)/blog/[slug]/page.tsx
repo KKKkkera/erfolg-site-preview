@@ -128,7 +128,8 @@ export default async function BlogPostPage({
                 src={post.coverUrl}
                 alt={post.title}
                 fill
-                priority
+                loading="eager"
+                fetchPriority="high"
                 sizes="(max-width: 1024px) 100vw, 768px"
                 className="object-cover"
               />

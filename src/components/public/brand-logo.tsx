@@ -11,7 +11,7 @@ type BrandLogoProps = {
   className?: string;
   /** Классы картинки: управляют высотой (h-9, h-10 и т.д.) */
   imgClassName?: string;
-  /** Логотип в шапке — выше сгиба, грузим с приоритетом */
+  /** Логотип в шапке — выше сгиба: грузим сразу и с высоким приоритетом */
   priority?: boolean;
 };
 
@@ -52,7 +52,8 @@ export function BrandLogo({
         width={621}
         height={200}
         sizes="140px"
-        priority={priority}
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
         className={cn("h-10 w-auto", imgClassName)}
       />
     </Link>

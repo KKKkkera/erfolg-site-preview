@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState, type ReactNode } from "react";
 
 import { Button, type ButtonProps } from "@/components/ui/button";
@@ -11,7 +12,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LeadForm } from "@/components/public/lead-form";
+
+/* Форма тянет за собой phone-input, валидацию и sonner — всё это нужно
+   только после клика по CTA, а кнопка есть в шапке каждой страницы.
+   Отдельный чанк снимает этот вес с первой загрузки. ssr: false здесь
+   безопасно: до открытия модалки формы нет и в серверном HTML. */
+const LeadForm = dynamic(
+  () => import("@/components/public/lead-form").then((m) => m.LeadForm),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-72 animate-pulse rounded-md bg-muted" aria-hidden="true" />
+    ),
+  },
+);
 
 type LeadDialogProps = {
   productId?: string;
